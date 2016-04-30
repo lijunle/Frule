@@ -10,3 +10,9 @@ type Rule = {
     FromAddresses: EmailAddress seq;
     SentToAddresses: EmailAddress seq;
 }
+
+type Folder = {
+    Id: FolderId;
+    Name: string;
+    Children: Folder list;
+}

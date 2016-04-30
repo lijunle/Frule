@@ -1,5 +1,6 @@
 ﻿module Program
 
+open Folder
 open Rule
 open ServiceUrl
 open System
@@ -23,4 +24,8 @@ let main argv =
         serviceUrl >>= (fun serviceUrl ->
         getRules email password serviceUrl |> Some)
     printfn "%A" rules
+    let folders =
+        serviceUrl >>= (fun serviceUrl ->
+        getFolderHierarchy email password serviceUrl |> Some)
+    printfn "%A" folders
     0

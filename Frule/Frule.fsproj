@@ -54,6 +54,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="DomainTypes.fs" />
     <Compile Include="ServiceUrl.fs" />
+    <Compile Include="Folder.fs" />
     <Compile Include="Rule.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
