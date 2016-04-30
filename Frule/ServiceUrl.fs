@@ -1,8 +1,8 @@
 ﻿module ServiceUrl
 
-open System
 open Microsoft.Exchange.WebServices.Autodiscover
 open Microsoft.Exchange.WebServices.Data
+open System
 
 let redirectionUrlValidationCallback (redirectionUrl : string) =
     let redirectionUri = new Uri(redirectionUrl)
