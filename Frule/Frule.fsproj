@@ -52,7 +52,9 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="DomainTypes.fs" />
     <Compile Include="ServiceUrl.fs" />
+    <Compile Include="Rule.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

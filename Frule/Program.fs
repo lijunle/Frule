@@ -1,5 +1,6 @@
 ﻿module Program
 
+open Rule
 open ServiceUrl
 open System
 open System.Diagnostics
@@ -17,7 +18,9 @@ let main argv =
     let email = argv.[0]
     let password = argv.[1]
     let serviceUrl = time (fun () -> getServiceUrl email password)
-    match serviceUrl with
-    | None -> printfn "Service URL not found!"
-    | Some serviceUrl -> printfn "%A" serviceUrl
+    let (>>=) v f = Option.bind f v
+    let rules =
+        serviceUrl >>= (fun serviceUrl ->
+        getRules email password serviceUrl |> Some)
+    printfn "%A" rules
     0
