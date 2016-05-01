@@ -20,12 +20,9 @@ let main argv =
     let password = argv.[1]
     let serviceUrl = time (fun () -> getServiceUrl email password)
     let (>>=) v f = Option.bind f v
-    let rules =
-        serviceUrl >>= (fun serviceUrl ->
-        getRules email password serviceUrl |> Some)
-    printfn "%A" rules
     let folders =
         serviceUrl >>= (fun serviceUrl ->
-        getFolderHierarchy email password serviceUrl |> Some)
+        getRules email password serviceUrl |> List.ofSeq |> Some >>= (fun rules ->
+        getFolderHierarchy email password serviceUrl rules |> Some))
     printfn "%A" folders
     0
