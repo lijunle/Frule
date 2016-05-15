@@ -2,7 +2,7 @@
 
 open Folder
 open Rule
-open ServiceUrl
+open Service
 open System
 open System.Diagnostics
 
@@ -18,12 +18,11 @@ let time fn =
 let main argv =
     let email = argv.[0]
     let password = argv.[1]
-    let serviceUrl = time (fun () -> getServiceUrl email password)
     let getFolders () =
         Result.result {
-            let! url = serviceUrl
-            let rules = getRules email password url |> List.ofSeq
-            let result = getFolderHierarchy email password url rules
+            let! service = getService email password
+            let rules = getRules service |> List.ofSeq
+            let result = getFolderHierarchy service rules
             return result
         }
     let folders = time (fun () -> getFolders ())
