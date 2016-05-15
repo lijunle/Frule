@@ -54,6 +54,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
+    <Resource Include="LoginDialog.xaml" />
     <Resource Include="MainWindow.xaml" />
   </ItemGroup>
   <PropertyGroup>
