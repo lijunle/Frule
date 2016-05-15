@@ -19,6 +19,10 @@ let toRule (rule : Rule) =
     }
 
 let getRules (service : ExchangeService) =
-    service.GetInboxRules()
-    |> Seq.filter isRule
-    |> Seq.map toRule
+    try
+        service.GetInboxRules()
+        |> Seq.filter isRule
+        |> Seq.map toRule
+        |> Success
+    with e ->
+        Failure e

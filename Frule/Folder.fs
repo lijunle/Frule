@@ -23,16 +23,21 @@ let buildFolderHierarchy (inboxId, inboxName) (folders : Folder list) (rules : D
     loop (inboxId, inboxName)
 
 let getFolders (service : ExchangeService) =
-    let inboxWellKnownId = FolderId(WellKnownFolderName.Inbox)
-    let propertySet = PropertySet.FirstClassProperties
-    let folders =
-        service.SyncFolderHierarchy(inboxWellKnownId, propertySet, null)
-        |> Seq.map (fun changed -> changed.Folder)
-        |> List.ofSeq
-    folders
+    try
+        let inboxWellKnownId = FolderId(WellKnownFolderName.Inbox)
+        let propertySet = PropertySet.FirstClassProperties
+        let folders =
+            service.SyncFolderHierarchy(inboxWellKnownId, propertySet, null)
+            |> Seq.map (fun changed -> changed.Folder)
+            |> List.ofSeq
+        Success folders
+    with e ->
+        Failure e
 
 let getFolderHierarchy (service : ExchangeService) rules =
-    let folders = getFolders service
-    let inboxId = folders.[0].ParentFolderId
-    let inboxName = WellKnownFolderName.Inbox.ToString()
-    buildFolderHierarchy (inboxId, inboxName) folders rules
+    Result.result {
+        let! folders = getFolders service
+        let inboxId = folders.[0].ParentFolderId
+        let inboxName = WellKnownFolderName.Inbox.ToString()
+        return buildFolderHierarchy (inboxId, inboxName) folders rules
+    }

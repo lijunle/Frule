@@ -8,6 +8,11 @@ let bind f x =
 let ret x =
     Success x
 
+let map f x =
+    match x with
+    | Success v -> f v |> ret
+    | Failure e -> Failure e
+
 let ifSuccessDo x f =
     bind (f >> ret) x |> ignore
 

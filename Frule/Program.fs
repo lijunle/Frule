@@ -21,10 +21,10 @@ let main argv =
     let getFolders () =
         Result.result {
             let! service = getService email password
-            let rules = getRules service |> List.ofSeq
-            let result = getFolderHierarchy service rules
+            let! rules = getRules service |> Result.map List.ofSeq
+            let! result = getFolderHierarchy service rules
             return result
         }
-    let folders = time (fun () -> getFolders ())
+    let folders = time getFolders
     printfn "%A" folders
     0
