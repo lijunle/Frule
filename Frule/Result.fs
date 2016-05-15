@@ -8,6 +8,9 @@ let bind f x =
 let ret x =
     Success x
 
+let ifSuccessDo x f =
+    bind (f >> ret) x |> ignore
+
 type Builder() =
     member this.Bind(x, f) = bind f x
     member this.Return(x) = ret x
