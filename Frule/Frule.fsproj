@@ -53,7 +53,8 @@
     <Content Include="packages.config" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="DomainTypes.fs" />
-    <Compile Include="ServiceUrl.fs" />
+    <Compile Include="Result.fs" />
+    <Compile Include="Service.fs" />
     <Compile Include="Folder.fs" />
     <Compile Include="Rule.fs" />
     <Compile Include="Program.fs" />

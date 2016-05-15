@@ -2,6 +2,11 @@
 module DomainTypes
 
 open Microsoft.Exchange.WebServices.Data
+open System
+
+type Result<'t> =
+    | Success of 't
+    | Failure of Exception
 
 type Rule = {
     Id: string;

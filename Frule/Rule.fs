@@ -18,10 +18,11 @@ let toRule (rule : Rule) =
         SentToAddresses = rule.Conditions.SentToAddresses;
     }
 
-let getRules email password serviceUrl =
-    let credential = WebCredentials(email, password)
-    let service = ExchangeService(ExchangeVersion.Exchange2013_SP1, Credentials = credential)
-    service.Url <- serviceUrl
-    service.GetInboxRules()
-    |> Seq.filter isRule
-    |> Seq.map toRule
+let getRules (service : ExchangeService) =
+    try
+        service.GetInboxRules()
+        |> Seq.filter isRule
+        |> Seq.map toRule
+        |> Success
+    with e ->
+        Failure e
