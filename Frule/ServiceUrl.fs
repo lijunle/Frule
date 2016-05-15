@@ -15,8 +15,9 @@ let autodiscoverServiceUrl email password =
         let service = ExchangeService(ExchangeVersion.Exchange2013_SP1, Credentials = credential)
         let callback = AutodiscoverRedirectionUrlValidationCallback(redirectionUrlValidationCallback)
         service.AutodiscoverUrl(email, callback)
-        Option.ofObj service.Url
-    with e -> None
+        Result.ret service.Url
+    with e ->
+        Result.Failure e
 
 let getServiceUrl email password =
     // TODO read from local cache
