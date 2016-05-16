@@ -3,19 +3,21 @@
 open System
 open System.Windows
 
-let getXamlResource xaml =
-    Application.LoadComponent(Uri(xaml, UriKind.Relative))
-    :?> _
-
-let startApplication (application: Application) (event: StartupEventArgs) =
-    let loginDialog : Window = getXamlResource "LoginDialog.xaml"
-    loginDialog.Closing.Add (fun _ -> application.Shutdown())
-    loginDialog.Show()
-    ()
-
 [<STAThread>]
 [<EntryPoint>]
 let main args =
     let application = Application(ShutdownMode = ShutdownMode.OnExplicitShutdown)
-    application.Startup.Add (startApplication application)
+    let setState state =
+        match state with
+        | Shutdown ->
+            application.Shutdown()
+        | LoginDialog ->
+            MainWindow.instance.Hide()
+            LoginDialog.instance.Show()
+        | MainWindow ->
+            LoginDialog.instance.Hide()
+            MainWindow.instance.Show()
+    MainWindow.initialize setState
+    LoginDialog.initialize setState
+    application.Startup.Add (fun _ -> setState LoginDialog)
     application.Run()

@@ -9,9 +9,9 @@
     <StackPanel Margin="10">
         <TextBlock Text="Frule Login"/>
         <TextBlock Text="Email"/>
-        <TextBox x:Name="emailTextBox"/>
+        <TextBox x:Name="emailTextBox" Text="{Binding Email}"/>
         <TextBlock Text="Password"/>
-        <TextBox x:Name="passwordTextBox"/>
+        <TextBox x:Name="passwordTextBox" Text="{Binding Password}"/>
         <Button x:Name="loginButton" Content="Login"/>
         <Button x:Name="cancelButton" Content="Cancel"/>
     </StackPanel>
