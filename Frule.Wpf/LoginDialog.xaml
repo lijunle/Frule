@@ -12,7 +12,7 @@
         <TextBox x:Name="emailTextBox" Text="{Binding Email}"/>
         <TextBlock Text="Password"/>
         <TextBox x:Name="passwordTextBox" Text="{Binding Password}"/>
-        <Button x:Name="loginButton" Content="Login"/>
-        <Button x:Name="cancelButton" Content="Cancel"/>
+        <Button x:Name="loginButton" Content="Login" Command="{Binding LoginCommand}"/>
+        <Button x:Name="cancelButton" Content="Cancel" Command="{Binding CancelCommand}"/>
     </StackPanel>
 </Window>
