@@ -7,8 +7,7 @@ type LoginDialogViewModel(setState) as this =
     let shutdown () =
         setState Shutdown
     let login () =
-        printf "%A" this
-        setState MainWindow
+        setState (MainWindow (this.Email, this.Password))
     member val Email = "" with get, set
     member val Password = "" with get, set
     member val CancelCommand = Command(shutdown)

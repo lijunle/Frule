@@ -7,5 +7,39 @@
     Width="1000"
 >
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="5*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="3*"/>
+        </Grid.RowDefinitions>
+        <TreeView x:Name="treeView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding InboxFolder}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding Name}"/>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ElementName=treeView, Path=SelectedItem.Rules}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel DataContext="{Binding ElementName=listBox, Path=SelectedItem}">
+                <Label>Name</Label>
+                <TextBox Text="{Binding Name, Mode=OneWay}"/>
+                <Label>Folder</Label>
+                <TextBox Text="{Binding Folder, Mode=OneWay}"/>
+                <Label>From Addresses</Label>
+                <ListBox ItemsSource="{Binding FromAddresses}"/>
+                <Label>Sent To Addresses</Label>
+                <ListBox ItemsSource="{Binding SentToAddresses}"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

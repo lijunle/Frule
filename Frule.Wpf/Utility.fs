@@ -7,7 +7,7 @@ open System.Windows.Input
 
 type WindowState =
     | LoginDialog
-    | MainWindow
+    | MainWindow of (string * string)
     | Shutdown
 
 type Command(execute, ?canExecute) =
