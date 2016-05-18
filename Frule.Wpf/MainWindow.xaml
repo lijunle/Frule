@@ -1,11 +1,14 @@
 ﻿<Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:Frule.Wpf"
+    xmlns:viewModel="clr-namespace:ViewModels;assembly=Frule.Wpf"
     Title="Frule"
     Height="600"
     Width="1000"
 >
+    <Window.DataContext>
+        <viewModel:MainWindowViewModel/>
+    </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
