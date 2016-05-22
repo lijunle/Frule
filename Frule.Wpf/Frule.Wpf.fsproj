@@ -58,7 +58,6 @@
     <None Include="App.config" />
     <Content Include="packages.config" />
     <Compile Include="User.fs" />
-    <Compile Include="Utility.fs" />
     <Resource Include="LoginDialog.xaml" />
     <Compile Include="LoginDialog.xaml.fs" />
     <Compile Include="LoginDialogViewModel.fs" />
