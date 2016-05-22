@@ -57,14 +57,29 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
-    <Compile Include="Utility.fs" />
+    <Compile Include="User.fs" />
     <Resource Include="LoginDialog.xaml" />
     <Compile Include="LoginDialog.xaml.fs" />
+    <Compile Include="LoginDialogViewModel.fs" />
     <Resource Include="MainWindow.xaml" />
     <Compile Include="MainWindow.xaml.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="MainWindowViewModel.fs" />
+    <Resource Include="App.xaml" />
+    <Compile Include="App.xaml.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.ViewModule">
+      <HintPath>..\packages\FSharp.ViewModule.Core.0.9.9.3\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\FSharp.ViewModule.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FsXaml.Wpf">
+      <HintPath>..\packages\FsXaml.Wpf.2.1.0\lib\net45\FsXaml.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FsXaml.Wpf.TypeProvider">
+      <HintPath>..\packages\FsXaml.Wpf.2.1.0\lib\net45\FsXaml.Wpf.TypeProvider.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Exchange.WebServices">
       <HintPath>..\packages\Microsoft.Exchange.WebServices.2.2\lib\40\Microsoft.Exchange.WebServices.dll</HintPath>
       <Private>True</Private>
@@ -83,6 +98,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <ProjectReference Include="..\Frule\Frule.fsproj">
       <Name>Frule</Name>
