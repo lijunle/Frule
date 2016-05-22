@@ -14,3 +14,4 @@ type LoginDialogViewModel() as this =
     member this.Email with get() = email.Value and set value = email.Value <- value
     member this.Password with get() = password.Value and set value = password.Value <- value
     member this.LoginCommand = loginCommand
+    member this.CancelCommand = this.Factory.CommandSync(Application.Current.Shutdown)
