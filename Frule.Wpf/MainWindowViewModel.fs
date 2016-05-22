@@ -1,10 +1,13 @@
 ﻿namespace ViewModels
 
-open Service
-open Rule
+open FSharp.ViewModule
 open Folder
+open Rule
+open Service
 
 type MainWindowViewModel() =
+    inherit ViewModelBase()
+
     let email = ""
     let password = ""
 
@@ -21,4 +24,4 @@ type MainWindowViewModel() =
         | Success f -> f
         | Failure e -> { Id = null; Name= "Inbox"; Children= []; Rules= [] }
 
-    member x.InboxFolder with get() = [inboxFolder]
+    member this.InboxFolder with get() = [inboxFolder]
