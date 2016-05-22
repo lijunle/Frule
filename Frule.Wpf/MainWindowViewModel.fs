@@ -25,3 +25,4 @@ type MainWindowViewModel() =
         | Failure e -> { Id = null; Name= "Inbox"; Children= []; Rules= [] }
 
     member this.InboxFolder with get() = [inboxFolder]
+    member this.LoginCommand = this.Factory.CommandSync(fun _ -> Views.LoginDialog().ShowDialog() |> ignore)

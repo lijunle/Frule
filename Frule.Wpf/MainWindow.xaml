@@ -18,13 +18,16 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
-        <TreeView x:Name="treeView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding InboxFolder}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Name}"/>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+        <DockPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+            <Button DockPanel.Dock="Bottom" Command="{Binding LoginCommand}">Login</Button>
+            <TreeView x:Name="treeView" ItemsSource="{Binding InboxFolder}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Name}"/>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </DockPanel>
         <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ElementName=treeView, Path=SelectedItem.Rules}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
