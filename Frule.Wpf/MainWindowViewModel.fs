@@ -5,24 +5,32 @@ open Folder
 open Rule
 open Service
 
-type MainWindowViewModel() =
+type MainWindowViewModel() as this =
     inherit ViewModelBase()
 
-    let email = ""
-    let password = ""
+    let loadingFolder = { Id = null; Name= "Loading"; Children= []; Rules= [] }
+    let inboxFolder = this.Factory.Backing(<@ this.InboxFolder @>, loadingFolder)
 
-    let resultFolder =
-        Result.result {
-            let! service = getService email password
-            let! rules = getRules service |> Result.map List.ofSeq
-            let! result = getFolderHierarchy service rules
-            return result
-        }
+    let loadData (email, password) =
+        let resultFolder =
+            Result.result {
+                let! service = getService email password
+                let! rules = getRules service |> Result.map List.ofSeq
+                let! result = getFolderHierarchy service rules
+                return result
+            }
 
-    let inboxFolder =
-        match resultFolder with
-        | Success f -> f
-        | Failure e -> { Id = null; Name= "Inbox"; Children= []; Rules= [] }
+        inboxFolder.Value <-
+            match resultFolder with
+            | Success f -> f
+            | Failure _ -> { Id = null; Name= "Login Error"; Children= []; Rules= [] }
 
-    member this.InboxFolder with get() = [inboxFolder]
-    member this.LoginCommand = this.Factory.CommandSync(fun _ -> Views.LoginDialog().ShowDialog() |> ignore)
+    let login () =
+        Views.LoginDialog().ShowDialog() |> ignore
+        User.get () |> loadData
+
+    do
+        User.get () |> loadData
+
+    member this.InboxFolder with get() = [inboxFolder.Value]
+    member this.LoginCommand = this.Factory.CommandSync(login)
