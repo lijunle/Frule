@@ -3,32 +3,6 @@
 open Microsoft.Exchange.WebServices.Autodiscover
 open Microsoft.Exchange.WebServices.Data
 open System
-open System.IO
-
-let cacheFileName = "service.dat"
-
-let getServiceUrlFromFile email =
-    let split (line : string) =
-        let pair = line.Split('\t')
-        (pair.[0], pair.[1])
-    try
-        let cache = File.ReadAllLines(cacheFileName)
-                    |> Array.map split
-                    |> dict
-        let (ok, value) = cache.TryGetValue email
-        if ok
-        then Uri value |> Some
-        else None
-    with e -> None
-
-let writeServiceUrlToFile email url =
-    try
-        let line = sprintf "%s\t%s" email url
-        File.AppendAllText(cacheFileName, line)
-    with e -> ()
-
-let toString (uri : Uri) =
-    uri.ToString()
 
 let redirectionUrlValidationCallback =
     let callback (redirectionUrl : string) =

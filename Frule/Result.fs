@@ -13,9 +13,6 @@ let map f x =
     | Success v -> f v |> ret
     | Failure e -> Failure e
 
-let ifSuccessDo x f =
-    bind (f >> ret) x |> ignore
-
 type Builder() =
     member this.Bind(x, f) = bind f x
     member this.Return(x) = ret x
