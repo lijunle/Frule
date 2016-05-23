@@ -3,11 +3,12 @@
 open Microsoft.Exchange.WebServices.Data
 
 let isRule (rule : Rule) =
-    rule.Actions <> null &&
-    rule.Actions.MoveToFolder <> null &&
-    rule.Conditions <> null &&
-    rule.Conditions.FromAddresses <> null &&
-    rule.Conditions.SentToAddresses <> null
+    isNull rule.Actions ||
+    isNull rule.Actions.MoveToFolder ||
+    isNull rule.Conditions ||
+    isNull rule.Conditions.FromAddresses ||
+    isNull rule.Conditions.SentToAddresses
+    |> not
 
 let toRule (rule : Rule) =
     {

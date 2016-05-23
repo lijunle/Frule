@@ -8,6 +8,12 @@ type Result<'t> =
     | Success of 't
     | Failure of Exception
 
+type User = {
+    Email: string;
+    Password: string;
+    ServiceUrl: Uri;
+}
+
 type Rule = {
     Id: string;
     Name: string;
