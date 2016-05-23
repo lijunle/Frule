@@ -16,12 +16,16 @@ type MainWindowViewModel() as this =
             | Success f -> f
             | Failure _ -> { Id = null; Name= "Login Error"; Children= []; Rules= [] }
 
-    let login () =
-        Views.LoginDialog().ShowDialog() |> ignore
-        User.get () |> loadData
+    let loadDataAsync user = async {
+        do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
+        loadData user
+    }
 
-    do
-        User.get () |> loadData
+    let login _ =
+        Views.LoginDialog().ShowDialog() |> ignore
+        User.get () |> loadDataAsync
+
+    do Async.Start (User.get () |> loadDataAsync)
 
     member this.InboxFolder with get() = [inboxFolder.Value]
-    member this.LoginCommand = this.Factory.CommandSync(login)
+    member this.LoginCommand = this.Factory.CommandAsync(login)
