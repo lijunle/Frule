@@ -57,6 +57,7 @@
     <Compile Include="Service.fs" />
     <Compile Include="Folder.fs" />
     <Compile Include="Rule.fs" />
+    <Compile Include="User.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

@@ -20,7 +20,8 @@ let main argv =
     let password = argv.[1]
     let getFolders () =
         Result.result {
-            let! service = getService email password
+            let! user = User.construct (email, password)
+            let service = getService user
             let! rules = getRules service |> Result.map List.ofSeq
             let! result = getFolderHierarchy service rules
             return result
