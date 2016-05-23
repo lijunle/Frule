@@ -8,13 +8,8 @@ type MainWindowViewModel() as this =
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; Rules= [] }
     let inboxFolder = this.Factory.Backing(<@ this.InboxFolder @>, loadingFolder)
 
-    let loadData (email, password) =
-        let resultFolder =
-            Result.result {
-                let! user = User.construct (email, password)
-                let! inboxFolder = User.getInboxFolder user
-                return inboxFolder
-            }
+    let loadData user =
+        let resultFolder = User.getInboxFolder user
 
         inboxFolder.Value <-
             match resultFolder with

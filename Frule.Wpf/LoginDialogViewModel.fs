@@ -10,9 +10,13 @@ type LoginDialogViewModel() as this =
     let password = this.Factory.Backing(<@ this.Password @>, "")
 
     let login (dialog : Window) =
-        User.set (email.Value, password.Value)
-        // TODO verify the email and password
-        dialog.Close()
+        let user = User.construct (email.Value, password.Value)
+        match user with
+        | Success v ->
+            User.set v
+            dialog.Close()
+        | Failure _ ->
+            ()
 
     let cancel (dialog : Window) =
         dialog.Close()
