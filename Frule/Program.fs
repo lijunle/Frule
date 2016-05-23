@@ -1,8 +1,5 @@
 ﻿module Program
 
-open Folder
-open Rule
-open Service
 open System
 open System.Diagnostics
 
@@ -18,14 +15,12 @@ let time fn =
 let main argv =
     let email = argv.[0]
     let password = argv.[1]
-    let getFolders () =
+    let getInboxFolder () =
         Result.result {
             let! user = User.construct (email, password)
-            let service = getService user
-            let! rules = getRules service |> Result.map List.ofSeq
-            let! result = getFolderHierarchy service rules
-            return result
+            let! inboxFolder = User.getInboxFolder user
+            return inboxFolder
         }
-    let folders = time getFolders
+    let folders = time getInboxFolder
     printfn "%A" folders
     0

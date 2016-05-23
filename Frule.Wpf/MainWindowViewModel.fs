@@ -1,9 +1,6 @@
 ﻿namespace ViewModels
 
 open FSharp.ViewModule
-open Folder
-open Rule
-open Service
 
 type MainWindowViewModel() as this =
     inherit ViewModelBase()
@@ -15,10 +12,8 @@ type MainWindowViewModel() as this =
         let resultFolder =
             Result.result {
                 let! user = User.construct (email, password)
-                let service = getService user
-                let! rules = getRules service |> Result.map List.ofSeq
-                let! result = getFolderHierarchy service rules
-                return result
+                let! inboxFolder = User.getInboxFolder user
+                return inboxFolder
             }
 
         inboxFolder.Value <-
