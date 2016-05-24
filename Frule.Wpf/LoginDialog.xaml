@@ -28,5 +28,6 @@
             Command="{Binding CancelCommand, Mode=OneWay}"
             CommandParameter="{Binding ElementName=loginDialog}"
         />
+        <Label Content="{Binding State}" />
     </StackPanel>
 </Window>
