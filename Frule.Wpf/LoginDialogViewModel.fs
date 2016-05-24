@@ -20,8 +20,8 @@ type LoginDialogViewModel() as this =
                 state.Value <- "Login successful."
                 User.set v
                 dialog.Close()
-            | Failure _ ->
-                state.Value <- "Login failed."
+            | Failure e ->
+                state.Value <- sprintf "Login failed. %s" e.Message
         }
 
     let cancel (dialog : Window) =
