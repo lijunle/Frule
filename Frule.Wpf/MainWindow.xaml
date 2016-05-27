@@ -47,7 +47,7 @@
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel DataContext="{Binding ElementName=listBox, Path=SelectedItem}">
                 <Label>Name</Label>
-                <TextBox Text="{Binding Name, Mode=OneWay}"/>
+                <TextBox Text="{Binding Name}"/>
                 <Label>From Addresses</Label>
                 <ListBox ItemsSource="{Binding FromAddresses}"/>
                 <Label>Sent To Addresses</Label>

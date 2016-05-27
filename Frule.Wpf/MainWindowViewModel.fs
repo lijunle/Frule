@@ -2,6 +2,16 @@
 
 open FSharp.ViewModule
 
+type RuleViewModel(rule : Rule) as this =
+    inherit ViewModelBase()
+
+    let name = this.Factory.Backing(<@ this.Name @>, rule.Name)
+
+    member this.Name with get() = name.Value and set v = name.Value <- v
+    member this.FolderId = rule.FolderId
+    member this.FromAddresses = rule.FromAddresses
+    member this.SentToAddresses = rule.SentToAddresses
+
 type MainWindowViewModel() as this =
     inherit ViewModelBase()
 
@@ -18,7 +28,7 @@ type MainWindowViewModel() as this =
         inboxFolder.Value <- Result.orDefault folderResult loginErrorFolder
 
         let rulesResult = User.getRules user
-        rules.Value <- Result.orDefault rulesResult []
+        rules.Value <- Result.orDefault rulesResult [] |> List.map RuleViewModel
     }
 
     let login _ =
