@@ -20,7 +20,10 @@
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
-            <Button DockPanel.Dock="Bottom" Command="{Binding LoginCommand}">Login</Button>
+            <StackPanel DockPanel.Dock="Bottom">
+                <Button Command="{Binding LoginCommand}">Login</Button>
+                <Button Command="{Binding SaveCommand}">Save</Button>
+            </StackPanel>
             <TreeView x:Name="treeView" ItemsSource="{Binding InboxFolder}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
@@ -47,9 +50,7 @@
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel DataContext="{Binding ElementName=listBox, Path=SelectedItem}">
                 <Label>Name</Label>
-                <TextBox Text="{Binding Name, Mode=OneWay}"/>
-                <Label>Folder</Label>
-                <TextBox Text="{Binding FolderId, Mode=OneWay}"/>
+                <TextBox Text="{Binding Name}"/>
                 <Label>From Addresses</Label>
                 <ListBox ItemsSource="{Binding FromAddresses}"/>
                 <Label>Sent To Addresses</Label>
