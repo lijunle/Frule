@@ -20,7 +20,10 @@
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
-            <Button DockPanel.Dock="Bottom" Command="{Binding LoginCommand}">Login</Button>
+            <StackPanel DockPanel.Dock="Bottom">
+                <Button Command="{Binding LoginCommand}">Login</Button>
+                <Button Command="{Binding SaveCommand}">Save</Button>
+            </StackPanel>
             <TreeView x:Name="treeView" ItemsSource="{Binding InboxFolder}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
