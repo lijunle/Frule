@@ -16,6 +16,7 @@ type User = {
 
 type Rule = {
     Instance: Microsoft.Exchange.WebServices.Data.Rule;
+    Modified: bool;
     Id: string;
     Name: string;
     FolderId: FolderId;
