@@ -7,6 +7,7 @@ type MainWindowViewModel() as this =
 
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
     let inboxFolder = this.Factory.Backing(<@ this.InboxFolder @>, loadingFolder)
+    let rules = this.Factory.Backing(<@ this.Rules @>, [])
 
     let loadData user =
         let resultFolder = User.getInboxFolder user
@@ -28,4 +29,5 @@ type MainWindowViewModel() as this =
     do Async.Start (User.get () |> loadDataAsync)
 
     member this.InboxFolder with get() = [inboxFolder.Value]
+    member this.Rules with get() = rules.Value
     member this.LoginCommand = this.Factory.CommandAsync(login)

@@ -28,7 +28,7 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </DockPanel>
-        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ElementName=treeView, Path=SelectedItem.Rules}">
+        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Rules}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}"/>
