@@ -26,5 +26,4 @@ type Folder = {
     Id: FolderId;
     Name: string;
     Children: Folder list;
-    Rules: Rule list;
 }

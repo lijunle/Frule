@@ -11,7 +11,6 @@ let construct (email, password) =
 let getInboxFolder user =
     Result.result {
         let service = getService user
-        let! rules = Rule.getRules service |> Result.map List.ofSeq
-        let! result = Folder.getFolderHierarchy service rules
-        return result
+        let! inboxFolder = Folder.getFolderHierarchy service
+        return inboxFolder
     }
