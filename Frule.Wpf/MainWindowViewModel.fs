@@ -26,8 +26,12 @@ type MainWindowViewModel() as this =
         Views.LoginDialog().ShowDialog() |> ignore
         User.get () |> loadDataAsync
 
+    let selectFolder folder =
+        ()
+
     do Async.Start (User.get () |> loadDataAsync)
 
     member this.InboxFolder with get() = [inboxFolder.Value]
     member this.Rules with get() = rules.Value
     member this.LoginCommand = this.Factory.CommandAsync(login)
+    member this.SelectFolderCommand = this.Factory.CommandSyncParam(selectFolder)
