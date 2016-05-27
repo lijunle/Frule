@@ -2,12 +2,19 @@
 
 open FSharp.ViewModule
 
-type RuleViewModel(rule : Rule) as this =
+type RuleViewModel(update, rule : Rule) as this =
     inherit ViewModelBase()
 
+    let mutable model = rule
     let name = this.Factory.Backing(<@ this.Name @>, rule.Name)
 
-    member this.Name with get() = name.Value and set v = name.Value <- v
+    member this.Update newRule =
+        model <- newRule
+        name.Value <- newRule.Name
+        this
+
+    member this.Id = rule.Id
+    member this.Name with get() = name.Value and set v = update { rule with Name = v }
     member this.FolderId = rule.FolderId
     member this.FromAddresses = rule.FromAddresses
     member this.SentToAddresses = rule.SentToAddresses
@@ -21,6 +28,11 @@ type MainWindowViewModel() as this =
     let selectedFolder = this.Factory.Backing(<@ this.SelectedFolder @>, loginErrorFolder)
     let rules = this.Factory.Backing(<@ this.InternalRules @>, [])
 
+    let updateRule (rule : Rule) =
+        let update (r : RuleViewModel) = if r.Id = rule.Id then r.Update rule else r
+        let newRules = rules.Value |> List.map update
+        rules.Value <- newRules
+
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
@@ -28,7 +40,7 @@ type MainWindowViewModel() as this =
         inboxFolder.Value <- Result.orDefault folderResult loginErrorFolder
 
         let rulesResult = User.getRules user
-        rules.Value <- Result.orDefault rulesResult [] |> List.map RuleViewModel
+        rules.Value <- Result.orDefault rulesResult [] |> List.map (fun r -> RuleViewModel(updateRule, r))
     }
 
     let login _ =
