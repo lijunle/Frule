@@ -12,6 +12,7 @@ let isRule (rule : Rule) =
 
 let toRule (rule : Rule) =
     {
+        Instance = rule;
         Id = rule.Id;
         Name = rule.DisplayName;
         FolderId = rule.Actions.MoveToFolder;
@@ -27,3 +28,8 @@ let getRules (service : ExchangeService) =
         |> Success
     with e ->
         Failure e
+
+let updateName name rule =
+    let instance = rule.Instance
+    instance.DisplayName <- name
+    { rule with Name = name }

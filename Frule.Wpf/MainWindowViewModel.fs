@@ -14,7 +14,7 @@ type RuleViewModel(update, rule : Rule) as this =
         this
 
     member this.Id = rule.Id
-    member this.Name with get() = name.Value and set v = update { rule with Name = v }
+    member this.Name with get() = name.Value and set v = update (Rule.updateName v rule)
     member this.FolderId = rule.FolderId
     member this.FromAddresses = rule.FromAddresses
     member this.SentToAddresses = rule.SentToAddresses
