@@ -11,7 +11,7 @@ let buildFolderHierarchy (inboxId, inboxName) (folders : Folder list) (rules : D
 
         let targetRules =
             rules
-            |> List.filter (fun rule -> rule.Folder = folderId)
+            |> List.filter (fun rule -> rule.FolderId = folderId)
 
         {
             Id = folderId;

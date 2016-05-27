@@ -40,7 +40,7 @@
                 <Label>Name</Label>
                 <TextBox Text="{Binding Name, Mode=OneWay}"/>
                 <Label>Folder</Label>
-                <TextBox Text="{Binding Folder, Mode=OneWay}"/>
+                <TextBox Text="{Binding FolderId, Mode=OneWay}"/>
                 <Label>From Addresses</Label>
                 <ListBox ItemsSource="{Binding FromAddresses}"/>
                 <Label>Sent To Addresses</Label>
