@@ -17,7 +17,7 @@ type User = {
 type Rule = {
     Id: string;
     Name: string;
-    Folder: FolderId;
+    FolderId: FolderId;
     FromAddresses: EmailAddress seq;
     SentToAddresses: EmailAddress seq;
 }
@@ -26,5 +26,4 @@ type Folder = {
     Id: FolderId;
     Name: string;
     Children: Folder list;
-    Rules: Rule list;
 }

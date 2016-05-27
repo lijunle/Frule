@@ -14,7 +14,7 @@ let toRule (rule : Rule) =
     {
         Id = rule.Id;
         Name = rule.DisplayName;
-        Folder = rule.Actions.MoveToFolder;
+        FolderId = rule.Actions.MoveToFolder;
         FromAddresses = rule.Conditions.FromAddresses;
         SentToAddresses = rule.Conditions.SentToAddresses;
     }

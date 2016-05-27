@@ -15,12 +15,22 @@ let time fn =
 let main argv =
     let email = argv.[0]
     let password = argv.[1]
-    let getInboxFolder () =
+    let userResult = User.construct (email, password)
+
+    let inboxFolder = time (fun () ->
         Result.result {
-            let! user = User.construct (email, password)
+            let! user = userResult
             let! inboxFolder = User.getInboxFolder user
             return inboxFolder
-        }
-    let folders = time getInboxFolder
-    printfn "%A" folders
+        })
+    printfn "%A" inboxFolder
+
+    let rules = time (fun () ->
+        Result.result {
+            let! user = userResult
+            let! rules = User.getRules user
+            return rules
+        })
+    printfn "%A" rules
+
     0

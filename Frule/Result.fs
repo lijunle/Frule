@@ -1,5 +1,10 @@
 ﻿module Result
 
+let orDefault x d =
+    match x with
+    | Success v -> v
+    | Failure _ -> d
+
 let bind f x =
     match x with
     | Success v -> f v
