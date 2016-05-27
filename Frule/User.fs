@@ -14,3 +14,10 @@ let getInboxFolder user =
         let! inboxFolder = Folder.getFolderHierarchy service
         return inboxFolder
     }
+
+let getRules user =
+    Result.result {
+        let service = getService user
+        let! rules = Rule.getRules service |> Result.map List.ofSeq
+        return rules
+    }
