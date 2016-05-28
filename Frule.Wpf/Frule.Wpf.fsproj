@@ -57,6 +57,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <Compile Include="Event.fs" />
     <Compile Include="User.fs" />
     <Resource Include="LoginDialog.xaml" />
     <Compile Include="LoginDialog.xaml.fs" />
