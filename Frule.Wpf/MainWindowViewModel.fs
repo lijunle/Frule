@@ -2,6 +2,33 @@
 
 open FSharp.ViewModule
 
+type RuleStore = {
+    Initial: bool;
+    Model: Rule list;
+}
+
+type DisplayRuleState = {
+    RuleStore: RuleStore;
+    SelectedFolder: Folder;
+}
+
+type DisplayRuleChangeType =
+    | RuleStoreUpdated of RuleStore
+    | SelectedFolderChagned of Folder
+
+module DisplayRule =
+    let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
+    let loadingRuleStore = { Initial = false; Model = []; }
+    let loadingState = { RuleStore = loadingRuleStore; SelectedFolder = loadingFolder; }
+
+    let update s t =
+        match t with
+        | RuleStoreUpdated r -> { s with RuleStore = r }
+        | SelectedFolderChagned f -> { s with SelectedFolder = f }
+
+    let toList s =
+        s.RuleStore.Model |> List.filter (fun r -> r.FolderId = s.SelectedFolder.Id)
+
 type RuleViewModel(update, rule : Rule) as this =
     inherit ViewModelBase()
 
@@ -29,6 +56,9 @@ type MainWindowViewModel() as this =
     let selectedFolder = this.Factory.Backing(<@ this.SelectedFolder @>, loginErrorFolder)
     let rules = this.Factory.Backing(<@ this.InternalRules @>, [])
 
+    let ruleStore = Event<RuleStore>()
+    let folderSelectedEvent = Event<Folder>()
+
     let updateRule (rule : Rule) =
         let update (r : RuleViewModel) = if r.Id = rule.Id then r.Update rule else r
         let newRules = rules.Value |> List.map update
@@ -42,6 +72,7 @@ type MainWindowViewModel() as this =
 
         let rulesResult = User.getRules user
         rules.Value <- Result.orDefault rulesResult [] |> List.map (fun r -> RuleViewModel(updateRule, r))
+        ruleStore.Trigger { Initial = true; Model = Result.orDefault rulesResult []; }
     }
 
     let login _ =
@@ -57,6 +88,13 @@ type MainWindowViewModel() as this =
     }
 
     do
+        Event.merge
+            (ruleStore.Publish |> Event.map RuleStoreUpdated)
+            (folderSelectedEvent.Publish |> Event.map SelectedFolderChagned)
+            |> Event.scan DisplayRule.update DisplayRule.loadingState
+            |> Event.map DisplayRule.toList
+            |> Event.add (fun r -> this.DisplayRule <- r; this.RaisePropertyChanged(<@ this.DisplayRule @>))
+
         Async.Start (User.get () |> loadDataAsync)
 
         this.DependencyTracker.AddPropertyDependencies(
@@ -66,8 +104,10 @@ type MainWindowViewModel() as this =
     member private this.SelectedFolder with get() = selectedFolder.Value
     member private this.InternalRules with get() = rules.Value
 
+    member val DisplayRule = [] with get, set
+
     member this.InboxFolder with get() = [inboxFolder.Value]
     member this.Rules with get() = rules.Value |> List.filter (fun r -> r.FolderId = selectedFolder.Value.Id)
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsync(save)
-    member this.SelectFolderCommand = this.Factory.CommandSyncParam(fun v -> selectedFolder.Value <- v)
+    member this.SelectFolderCommand = this.Factory.CommandSyncParam(fun v -> selectedFolder.Value <- v; folderSelectedEvent.Trigger v)

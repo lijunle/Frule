@@ -40,7 +40,7 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </DockPanel>
-        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Rules}">
+        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding DisplayRule}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}"/>
@@ -50,7 +50,7 @@
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel DataContext="{Binding ElementName=listBox, Path=SelectedItem}">
                 <Label>Name</Label>
-                <TextBox Text="{Binding Name}"/>
+                <TextBox Text="{Binding Name, Mode=OneWay}"/>
                 <Label>From Addresses</Label>
                 <ListBox ItemsSource="{Binding FromAddresses}"/>
                 <Label>Sent To Addresses</Label>
