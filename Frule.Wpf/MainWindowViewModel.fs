@@ -13,7 +13,7 @@ type DisplayRuleChangeType =
 
 module DisplayRule =
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
-    let loadingRuleStore = { Modified = false; Model = []; }
+    let loadingRuleStore = { Model = []; }
     let loadingState = { RuleStore = loadingRuleStore; SelectedFolder = loadingFolder; }
 
     let update s t =
@@ -31,7 +31,7 @@ type MainWindowViewModel() as this =
     let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
     let inboxFolder = this.Factory.Backing(<@ this.InboxFolder @>, loadingFolder)
 
-    let emptyRule = { Modified = false; Instance = null; Id = null; Name = ""; FolderId = null; FromAddresses = []; SentToAddresses = [] }
+    let emptyRule = { Instance = null; Id = null; Name = ""; FolderId = null; FromAddresses = []; SentToAddresses = [] }
     let ruleStore = Event<RuleStore>()
     let ruleStoreSaved = Event<RuleStore>()
     let folderSelectedEvent = Event<Folder>()
@@ -40,7 +40,7 @@ type MainWindowViewModel() as this =
     let updateRuleName (ruleName : string) =
         let newRule = Rule.updateName ruleName this.SelectedRule
         let newRules = this.RuleStore.Model |> List.map (fun r -> if r.Id = this.SelectedRule.Id then newRule else r)
-        let newState = { Modified = true; Model = newRules; }
+        let newState = { Model = newRules; }
         ruleStore.Trigger newState
 
     let loadDataAsync user = async {
@@ -50,7 +50,7 @@ type MainWindowViewModel() as this =
         inboxFolder.Value <- Result.orDefault folderResult loginErrorFolder
 
         let rulesResult = User.getRules user
-        let store = { Modified = false; Model = Result.orDefault rulesResult []; }
+        let store = { Model = Result.orDefault rulesResult []; }
         ruleStore.Trigger store
         ruleStoreSaved.Trigger store
     }

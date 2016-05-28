@@ -13,7 +13,6 @@ let isRule (rule : Rule) =
 let toRule (rule : Rule) =
     {
         Instance = rule;
-        Modified = false;
         Id = rule.Id;
         Name = rule.DisplayName;
         FolderId = rule.Actions.MoveToFolder;
@@ -33,7 +32,7 @@ let getRules (service : ExchangeService) =
 let updateName name rule =
     let instance = rule.Instance
     instance.DisplayName <- name
-    { rule with Name = name; Modified = true; }
+    { rule with Name = name; }
 
 let private toOperation rule =
     SetRuleOperation(rule.Instance) :> RuleOperation
