@@ -24,8 +24,16 @@ module DisplayRule =
     let toList s =
         s.RuleStore.Rules |> List.filter (fun r -> r.FolderId = s.SelectedFolder.Id)
 
-type MainWindowViewModel() as this =
+type ViewModelSuperBase() as this =
     inherit ViewModelBase()
+
+    member __.SuperEvent<'t>(initialValue, expr : Quotations.Expr) =
+        let event = SuperEvent<'t>(initialValue)
+        event.Publish.Add (fun _ -> this.RaisePropertyChanged(expr))
+        event
+
+type MainWindowViewModel() as this =
+    inherit ViewModelSuperBase()
 
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
     let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
@@ -35,7 +43,7 @@ type MainWindowViewModel() as this =
     let ruleStore = SuperEvent<RuleStore>(RuleStore.Zero)
     let ruleStoreSaved = SuperEvent<RuleStore>(RuleStore.Zero)
     let folderSelectedEvent = Event<Folder>()
-    let ruleSelectedEvent = Event<Rule>()
+    let selectedRule = this.SuperEvent<Rule>(emptyRule, <@ this.SelectedRule @>)
 
     let updateRuleName (ruleName : string) =
         let newRule = Rule.updateName ruleName this.SelectedRule
@@ -76,9 +84,6 @@ type MainWindowViewModel() as this =
             |> Event.map DisplayRule.toList
             |> Event.add (fun r -> this.DisplayRule <- r; this.RaisePropertyChanged(<@ this.DisplayRule @>))
 
-        ruleSelectedEvent.Publish
-            |> Event.add (fun r -> this.SelectedRule <- r; this.RaisePropertyChanged(<@ this.SelectedRule @>))
-
         Event.pair
             (RuleStore.Zero, ruleStoreSaved.Publish)
             (RuleStore.Zero, ruleStore.Publish)
@@ -88,12 +93,12 @@ type MainWindowViewModel() as this =
         Async.Start (User.get () |> loadDataAsync)
 
     member val DisplayRule = [] with get, set
-    member val SelectedRule = emptyRule with get, set
     member val SaveEnabled = false with get, set
+    member __.SelectedRule with get() = selectedRule.Value
 
     member this.InboxFolder with get() = [inboxFolder.Value]
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> this.SaveEnabled)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(folderSelectedEvent.Trigger)
-    member this.SelectRuleCommand = this.Factory.CommandSyncParam(ruleSelectedEvent.Trigger)
+    member this.SelectRuleCommand = this.Factory.CommandSyncParam(selectedRule.Trigger)
     member this.ChangeRuleNameCommand = this.Factory.CommandSyncParam(updateRuleName)
