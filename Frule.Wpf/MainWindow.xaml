@@ -56,13 +56,13 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel DataContext="{Binding SelectedRule}">
+            <StackPanel>
                 <Label>Name</Label>
-                <TextBox Text="{Binding Name, Mode=OneWay}"/>
+                <TextBox Text="{Binding SelectedRule.Name, Mode=OneWay}"/>
                 <Label>From Addresses</Label>
-                <ListBox ItemsSource="{Binding FromAddresses}"/>
+                <ListBox ItemsSource="{Binding SelectedRule.FromAddresses}"/>
                 <Label>Sent To Addresses</Label>
-                <ListBox ItemsSource="{Binding SentToAddresses}"/>
+                <ListBox ItemsSource="{Binding SelectedRule.SentToAddresses}"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
