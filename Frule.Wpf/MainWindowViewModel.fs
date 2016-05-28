@@ -39,11 +39,10 @@ type MainWindowViewModel() as this =
     let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
     let inboxFolder = this.Factory.Backing(<@ this.InboxFolder @>, loadingFolder)
 
-    let emptyRule = { Instance = null; Id = null; Name = ""; FolderId = null; FromAddresses = []; SentToAddresses = [] }
     let ruleStore = SuperEvent<RuleStore>(RuleStore.Zero)
     let ruleStoreSaved = SuperEvent<RuleStore>(RuleStore.Zero)
     let selectedFolder = SuperEvent<Folder>(loadingFolder)
-    let selectedRule = this.SuperEvent<Rule>(emptyRule, <@ this.SelectedRule @>)
+    let selectedRule = this.SuperEvent<Rule>(Rule.Zero, <@ this.SelectedRule @>)
     let displayRules = this.SuperEvent<Rule list>([], <@ this.DisplayRules @>)
     let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
