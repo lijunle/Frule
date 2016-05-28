@@ -3,7 +3,7 @@
 open FSharp.ViewModule
 
 type RuleStore = {
-    Initial: bool;
+    Modified: bool;
     Model: Rule list;
 }
 
@@ -18,7 +18,7 @@ type DisplayRuleChangeType =
 
 module DisplayRule =
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
-    let loadingRuleStore = { Initial = false; Model = []; }
+    let loadingRuleStore = { Modified = false; Model = []; }
     let loadingState = { RuleStore = loadingRuleStore; SelectedFolder = loadingFolder; }
 
     let update s t =
@@ -44,7 +44,7 @@ type MainWindowViewModel() as this =
     let updateRuleName (ruleName : string) =
         let newRule = Rule.updateName ruleName this.SelectedRule
         let newRules = this.RuleStore.Model |> List.map (fun r -> if r.Id = this.SelectedRule.Id then newRule else r)
-        let newState = { Initial = false; Model = newRules; }
+        let newState = { Modified = true; Model = newRules; }
         ruleStore.Trigger newState
 
     let loadDataAsync user = async {
@@ -54,7 +54,7 @@ type MainWindowViewModel() as this =
         inboxFolder.Value <- Result.orDefault folderResult loginErrorFolder
 
         let rulesResult = User.getRules user
-        ruleStore.Trigger { Initial = true; Model = Result.orDefault rulesResult []; }
+        ruleStore.Trigger { Modified = false; Model = Result.orDefault rulesResult []; }
     }
 
     let login _ =
@@ -67,7 +67,7 @@ type MainWindowViewModel() as this =
         let user = User.get ()
         let rules = this.RuleStore.Model
         Rule.saveToServer user rules |> ignore
-        ruleStore.Trigger { Initial = true; Model = rules; }
+        ruleStore.Trigger { Modified = false; Model = rules; }
     }
 
     do
@@ -85,7 +85,7 @@ type MainWindowViewModel() as this =
             |> Event.add (fun r -> this.SelectedRule <- r; this.RaisePropertyChanged(<@ this.SelectedRule @>))
 
         ruleStore.Publish
-            |> Event.add (fun s -> this.SaveEnabled <- not s.Initial; this.RaisePropertyChanged(<@ this.SaveCommand @>))
+            |> Event.add (fun s -> this.SaveEnabled <- s.Modified; this.RaisePropertyChanged(<@ this.SaveCommand @>))
 
         Async.Start (User.get () |> loadDataAsync)
 
