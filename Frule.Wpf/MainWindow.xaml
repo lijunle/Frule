@@ -41,6 +41,14 @@
             </TreeView>
         </DockPanel>
         <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding DisplayRule}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding SelectRuleCommand}"
+                        CommandParameter="{Binding ElementName=listBox, Path=SelectedItem}"
+                    />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}"/>
@@ -48,7 +56,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel DataContext="{Binding ElementName=listBox, Path=SelectedItem}">
+            <StackPanel DataContext="{Binding SelectedRule}">
                 <Label>Name</Label>
                 <TextBox Text="{Binding Name, Mode=OneWay}"/>
                 <Label>From Addresses</Label>

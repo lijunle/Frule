@@ -35,6 +35,11 @@ type RuleViewModel(update, rule : Rule) as this =
     let mutable model = rule
     let name = this.Factory.Backing(<@ this.Name @>, rule.Name)
 
+    static member Empty =
+        let f _ = ()
+        let r = { Modified = false; Instance = null; Id = null; Name = ""; FolderId = null; FromAddresses = []; SentToAddresses = [] }
+        RuleViewModel(f, r)
+
     member this.Update newRule =
         model <- newRule
         name.Value <- newRule.Name
@@ -58,6 +63,7 @@ type MainWindowViewModel() as this =
 
     let ruleStore = Event<RuleStore>()
     let folderSelectedEvent = Event<Folder>()
+    let ruleSelectedEvent = Event<Rule>()
 
     let updateRule (rule : Rule) =
         let update (r : RuleViewModel) = if r.Id = rule.Id then r.Update rule else r
@@ -95,6 +101,9 @@ type MainWindowViewModel() as this =
             |> Event.map DisplayRule.toList
             |> Event.add (fun r -> this.DisplayRule <- r; this.RaisePropertyChanged(<@ this.DisplayRule @>))
 
+        ruleSelectedEvent.Publish
+            |> Event.add (fun r -> this.SelectedRule <- RuleViewModel(updateRule, r); this.RaisePropertyChanged(<@ this.SelectedRule @>))
+
         Async.Start (User.get () |> loadDataAsync)
 
         this.DependencyTracker.AddPropertyDependencies(
@@ -105,9 +114,11 @@ type MainWindowViewModel() as this =
     member private this.InternalRules with get() = rules.Value
 
     member val DisplayRule = [] with get, set
+    member val SelectedRule = RuleViewModel.Empty with get, set
 
     member this.InboxFolder with get() = [inboxFolder.Value]
     member this.Rules with get() = rules.Value |> List.filter (fun r -> r.FolderId = selectedFolder.Value.Id)
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsync(save)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(fun v -> selectedFolder.Value <- v; folderSelectedEvent.Trigger v)
+    member this.SelectRuleCommand = this.Factory.CommandSyncParam(ruleSelectedEvent.Trigger)
