@@ -58,7 +58,16 @@
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <Label>Name</Label>
-                <TextBox Text="{Binding SelectedRule.Name, Mode=OneWay}"/>
+                <TextBox x:Name="ruleName" Text="{Binding SelectedRule.Name, Mode=OneWay}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="LostFocus">
+                            <i:InvokeCommandAction
+                                Command="{Binding ChangeRuleNameCommand}"
+                                CommandParameter="{Binding ElementName=ruleName, Path=Text}"
+                            />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
                 <Label>From Addresses</Label>
                 <ListBox ItemsSource="{Binding SelectedRule.FromAddresses}"/>
                 <Label>Sent To Addresses</Label>

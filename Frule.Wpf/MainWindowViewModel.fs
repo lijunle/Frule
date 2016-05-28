@@ -61,6 +61,7 @@ type MainWindowViewModel() as this =
     let selectedFolder = this.Factory.Backing(<@ this.SelectedFolder @>, loginErrorFolder)
     let rules = this.Factory.Backing(<@ this.InternalRules @>, [])
 
+    let emptyRule = { Modified = false; Instance = null; Id = null; Name = ""; FolderId = null; FromAddresses = []; SentToAddresses = [] }
     let ruleStore = Event<RuleStore>()
     let folderSelectedEvent = Event<Folder>()
     let ruleSelectedEvent = Event<Rule>()
@@ -69,6 +70,12 @@ type MainWindowViewModel() as this =
         let update (r : RuleViewModel) = if r.Id = rule.Id then r.Update rule else r
         let newRules = rules.Value |> List.map update
         rules.Value <- newRules
+
+    let updateRuleName (ruleName : string) =
+        let newRule = Rule.updateName ruleName this.SelectedRule
+        let newRules = this.RuleStore.Model |> List.map (fun r -> if r.Id = this.SelectedRule.Id then newRule else r)
+        let newState = { Initial = false; Model = newRules; }
+        ruleStore.Trigger newState
 
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
@@ -101,8 +108,11 @@ type MainWindowViewModel() as this =
             |> Event.map DisplayRule.toList
             |> Event.add (fun r -> this.DisplayRule <- r; this.RaisePropertyChanged(<@ this.DisplayRule @>))
 
+        ruleStore.Publish
+            |> Event.add (fun s -> this.RuleStore <- s)
+
         ruleSelectedEvent.Publish
-            |> Event.add (fun r -> this.SelectedRule <- RuleViewModel(updateRule, r); this.RaisePropertyChanged(<@ this.SelectedRule @>))
+            |> Event.add (fun r -> this.SelectedRule <- r; this.RaisePropertyChanged(<@ this.SelectedRule @>))
 
         Async.Start (User.get () |> loadDataAsync)
 
@@ -113,8 +123,9 @@ type MainWindowViewModel() as this =
     member private this.SelectedFolder with get() = selectedFolder.Value
     member private this.InternalRules with get() = rules.Value
 
+    member val RuleStore = DisplayRule.loadingRuleStore with get, set
     member val DisplayRule = [] with get, set
-    member val SelectedRule = RuleViewModel.Empty with get, set
+    member val SelectedRule = emptyRule with get, set
 
     member this.InboxFolder with get() = [inboxFolder.Value]
     member this.Rules with get() = rules.Value |> List.filter (fun r -> r.FolderId = selectedFolder.Value.Id)
@@ -122,3 +133,4 @@ type MainWindowViewModel() as this =
     member this.SaveCommand = this.Factory.CommandAsync(save)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(fun v -> selectedFolder.Value <- v; folderSelectedEvent.Trigger v)
     member this.SelectRuleCommand = this.Factory.CommandSyncParam(ruleSelectedEvent.Trigger)
+    member this.ChangeRuleNameCommand = this.Factory.CommandSyncParam(updateRuleName)
