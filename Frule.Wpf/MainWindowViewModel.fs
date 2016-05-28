@@ -63,10 +63,10 @@ type MainWindowViewModel() as this =
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
         let user = User.get ()
-        let rules = this.RuleStore.Model
-        Rule.saveToServer user rules |> ignore
+        let modifiedRules = RuleStore.getDiffRules this.LastSavedRuleStore this.RuleStore
+        Rule.saveToServer user modifiedRules |> ignore
 
-        let store = { Modified = false; Model = rules; }
+        let store = this.RuleStore
         ruleStore.Trigger store
         ruleStoreSaved.Trigger store
     }
@@ -78,6 +78,9 @@ type MainWindowViewModel() as this =
             |> Event.scan DisplayRule.update DisplayRule.loadingState
             |> Event.map DisplayRule.toList
             |> Event.add (fun r -> this.DisplayRule <- r; this.RaisePropertyChanged(<@ this.DisplayRule @>))
+
+        ruleStoreSaved.Publish
+            |> Event.add (fun s -> this.LastSavedRuleStore <- s)
 
         ruleStore.Publish
             |> Event.add (fun s -> this.RuleStore <- s)
@@ -94,6 +97,7 @@ type MainWindowViewModel() as this =
         Async.Start (User.get () |> loadDataAsync)
 
     member val RuleStore = DisplayRule.loadingRuleStore with get, set
+    member val LastSavedRuleStore = DisplayRule.loadingRuleStore with get, set
     member val DisplayRule = [] with get, set
     member val SelectedRule = emptyRule with get, set
     member val SaveEnabled = false with get, set

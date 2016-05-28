@@ -35,15 +35,12 @@ let updateName name rule =
     instance.DisplayName <- name
     { rule with Name = name; Modified = true; }
 
-let toOperation rule =
+let private toOperation rule =
     SetRuleOperation(rule.Instance) :> RuleOperation
 
 let saveToServer user rules =
     Result.result {
         let service = Service.getService user
-        let ruleOperations =
-            rules
-            |> List.filter (fun r -> r.Modified)
-            |> List.map toOperation
+        let ruleOperations = rules |> List.map toOperation
         return service.UpdateInboxRules(ruleOperations, true)
     }
