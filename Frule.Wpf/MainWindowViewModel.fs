@@ -81,11 +81,11 @@ type MainWindowViewModel() as this =
         selectedFolder.Publish
             |> Event.add (fun _ -> selectedRule.Trigger Rule.Zero)
 
-        SuperEvent.pair ruleStore selectedFolder
+        SuperEvent.zip ruleStore selectedFolder
             |> Event.map (fun (s, f) -> s.Rules |> List.filter (fun r -> r.FolderId = f.Id))
             |> Event.add (displayRules.Trigger)
 
-        SuperEvent.pair ruleStoreSaved ruleStore
+        SuperEvent.zip ruleStoreSaved ruleStore
             |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)
             |> Event.add (saveEnabled.Trigger)
 

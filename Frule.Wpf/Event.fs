@@ -1,6 +1,6 @@
 ﻿module Event
 
-let pair (d1, e1) (d2, e2) =
+let zip (d1, e1) (d2, e2) =
     let mutable v1 = d1
     let mutable v2 = d2
     Event.merge
