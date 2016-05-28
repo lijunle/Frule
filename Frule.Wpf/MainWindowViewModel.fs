@@ -81,16 +81,11 @@ type MainWindowViewModel() as this =
         selectedFolder.Publish
             |> Event.add (fun _ -> selectedRule.Trigger Rule.Zero)
 
-        Event.merge
-            (ruleStore.Publish |> Event.map RuleStoreUpdated)
-            (selectedFolder.Publish |> Event.map SelectedFolderChagned)
-            |> Event.scan DisplayRule.update DisplayRule.loadingState
-            |> Event.map DisplayRule.toList
+        SuperEvent.pair ruleStore selectedFolder
+            |> Event.map (fun (s, f) -> s.Rules |> List.filter (fun r -> r.FolderId = f.Id))
             |> Event.add (displayRules.Trigger)
 
-        Event.pair
-            (RuleStore.Zero, ruleStoreSaved.Publish)
-            (RuleStore.Zero, ruleStore.Publish)
+        SuperEvent.pair ruleStoreSaved ruleStore
             |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)
             |> Event.add (saveEnabled.Trigger)
 
