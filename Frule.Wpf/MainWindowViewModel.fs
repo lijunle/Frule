@@ -78,6 +78,9 @@ type MainWindowViewModel() as this =
     }
 
     do
+        selectedFolder.Publish
+            |> Event.add (fun _ -> selectedRule.Trigger Rule.Zero)
+
         Event.merge
             (ruleStore.Publish |> Event.map RuleStoreUpdated)
             (selectedFolder.Publish |> Event.map SelectedFolderChagned)
