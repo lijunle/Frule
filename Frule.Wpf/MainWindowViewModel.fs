@@ -44,6 +44,8 @@ type MainWindowViewModel() as this =
     let ruleStoreSaved = SuperEvent<RuleStore>(RuleStore.Zero)
     let folderSelectedEvent = Event<Folder>()
     let selectedRule = this.SuperEvent<Rule>(emptyRule, <@ this.SelectedRule @>)
+    let displayRules = this.SuperEvent<Rule list>([], <@ this.DisplayRules @>)
+    let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
     let updateRuleName (ruleName : string) =
         let newRule = Rule.updateName ruleName this.SelectedRule
@@ -82,23 +84,22 @@ type MainWindowViewModel() as this =
             (folderSelectedEvent.Publish |> Event.map SelectedFolderChagned)
             |> Event.scan DisplayRule.update DisplayRule.loadingState
             |> Event.map DisplayRule.toList
-            |> Event.add (fun r -> this.DisplayRule <- r; this.RaisePropertyChanged(<@ this.DisplayRule @>))
+            |> Event.add (displayRules.Trigger)
 
         Event.pair
             (RuleStore.Zero, ruleStoreSaved.Publish)
             (RuleStore.Zero, ruleStore.Publish)
-            |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2)
-            |> Event.add (fun v -> this.SaveEnabled <- v <> 0; this.RaisePropertyChanged(<@ this.SaveCommand @>))
+            |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)
+            |> Event.add (saveEnabled.Trigger)
 
         Async.Start (User.get () |> loadDataAsync)
 
-    member val DisplayRule = [] with get, set
-    member val SaveEnabled = false with get, set
+    member __.DisplayRules with get() = displayRules.Value
     member __.SelectedRule with get() = selectedRule.Value
 
     member this.InboxFolder with get() = [inboxFolder.Value]
     member this.LoginCommand = this.Factory.CommandAsync(login)
-    member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> this.SaveEnabled)
+    member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(folderSelectedEvent.Trigger)
     member this.SelectRuleCommand = this.Factory.CommandSyncParam(selectedRule.Trigger)
     member this.ChangeRuleNameCommand = this.Factory.CommandSyncParam(updateRuleName)
