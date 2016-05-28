@@ -96,8 +96,9 @@ type MainWindowViewModel() as this =
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
         let user = User.get ()
-        let rules = rules.Value |> List.map (fun r -> r.Model)
+        let rules = this.RuleStore.Model
         Rule.saveToServer user rules |> ignore
+        ruleStore.Trigger { Initial = true; Model = rules; }
     }
 
     do
@@ -114,6 +115,9 @@ type MainWindowViewModel() as this =
         ruleSelectedEvent.Publish
             |> Event.add (fun r -> this.SelectedRule <- r; this.RaisePropertyChanged(<@ this.SelectedRule @>))
 
+        ruleStore.Publish
+            |> Event.add (fun s -> this.SaveEnabled <- not s.Initial; this.RaisePropertyChanged(<@ this.SaveCommand @>))
+
         Async.Start (User.get () |> loadDataAsync)
 
         this.DependencyTracker.AddPropertyDependencies(
@@ -126,11 +130,12 @@ type MainWindowViewModel() as this =
     member val RuleStore = DisplayRule.loadingRuleStore with get, set
     member val DisplayRule = [] with get, set
     member val SelectedRule = emptyRule with get, set
+    member val SaveEnabled = false with get, set
 
     member this.InboxFolder with get() = [inboxFolder.Value]
     member this.Rules with get() = rules.Value |> List.filter (fun r -> r.FolderId = selectedFolder.Value.Id)
     member this.LoginCommand = this.Factory.CommandAsync(login)
-    member this.SaveCommand = this.Factory.CommandAsync(save)
+    member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> this.SaveEnabled)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(fun v -> selectedFolder.Value <- v; folderSelectedEvent.Trigger v)
     member this.SelectRuleCommand = this.Factory.CommandSyncParam(ruleSelectedEvent.Trigger)
     member this.ChangeRuleNameCommand = this.Factory.CommandSyncParam(updateRuleName)
