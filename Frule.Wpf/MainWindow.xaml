@@ -40,7 +40,15 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </DockPanel>
-        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Rules}">
+        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding DisplayRule}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding SelectRuleCommand}"
+                        CommandParameter="{Binding ElementName=listBox, Path=SelectedItem}"
+                    />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}"/>
@@ -48,13 +56,22 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel DataContext="{Binding ElementName=listBox, Path=SelectedItem}">
+            <StackPanel>
                 <Label>Name</Label>
-                <TextBox Text="{Binding Name}"/>
+                <TextBox x:Name="ruleName" Text="{Binding SelectedRule.Name, Mode=OneWay}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="LostFocus">
+                            <i:InvokeCommandAction
+                                Command="{Binding ChangeRuleNameCommand}"
+                                CommandParameter="{Binding ElementName=ruleName, Path=Text}"
+                            />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
                 <Label>From Addresses</Label>
-                <ListBox ItemsSource="{Binding FromAddresses}"/>
+                <ListBox ItemsSource="{Binding SelectedRule.FromAddresses}"/>
                 <Label>Sent To Addresses</Label>
-                <ListBox ItemsSource="{Binding SentToAddresses}"/>
+                <ListBox ItemsSource="{Binding SelectedRule.SentToAddresses}"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
