@@ -2,28 +2,6 @@
 
 open FSharp.ViewModule
 
-type DisplayRuleState = {
-    RuleStore: RuleStore;
-    SelectedFolder: Folder;
-}
-
-type DisplayRuleChangeType =
-    | RuleStoreUpdated of RuleStore
-    | SelectedFolderChagned of Folder
-
-module DisplayRule =
-    let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
-    let loadingRuleStore = { Rules = []; }
-    let loadingState = { RuleStore = loadingRuleStore; SelectedFolder = loadingFolder; }
-
-    let update s t =
-        match t with
-        | RuleStoreUpdated r -> { s with RuleStore = r }
-        | SelectedFolderChagned f -> { s with SelectedFolder = f }
-
-    let toList s =
-        s.RuleStore.Rules |> List.filter (fun r -> r.FolderId = s.SelectedFolder.Id)
-
 type ViewModelSuperBase() as this =
     inherit ViewModelBase()
 
