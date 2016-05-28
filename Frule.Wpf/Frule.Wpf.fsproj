@@ -57,7 +57,10 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <Compile Include="Event.fs" />
+    <Compile Include="DomainTypes.fs" />
     <Compile Include="User.fs" />
+    <Compile Include="RuleStore.fs" />
     <Resource Include="LoginDialog.xaml" />
     <Compile Include="LoginDialog.xaml.fs" />
     <Compile Include="LoginDialogViewModel.fs" />
