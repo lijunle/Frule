@@ -33,6 +33,7 @@ type MainWindowViewModel() as this =
 
     let emptyRule = { Modified = false; Instance = null; Id = null; Name = ""; FolderId = null; FromAddresses = []; SentToAddresses = [] }
     let ruleStore = Event<RuleStore>()
+    let ruleStoreSaved = Event<RuleStore>()
     let folderSelectedEvent = Event<Folder>()
     let ruleSelectedEvent = Event<Rule>()
 
@@ -49,7 +50,9 @@ type MainWindowViewModel() as this =
         inboxFolder.Value <- Result.orDefault folderResult loginErrorFolder
 
         let rulesResult = User.getRules user
-        ruleStore.Trigger { Modified = false; Model = Result.orDefault rulesResult []; }
+        let store = { Modified = false; Model = Result.orDefault rulesResult []; }
+        ruleStore.Trigger store
+        ruleStoreSaved.Trigger store
     }
 
     let login _ =
@@ -62,7 +65,10 @@ type MainWindowViewModel() as this =
         let user = User.get ()
         let rules = this.RuleStore.Model
         Rule.saveToServer user rules |> ignore
-        ruleStore.Trigger { Modified = false; Model = rules; }
+
+        let store = { Modified = false; Model = rules; }
+        ruleStore.Trigger store
+        ruleStoreSaved.Trigger store
     }
 
     do
@@ -79,8 +85,11 @@ type MainWindowViewModel() as this =
         ruleSelectedEvent.Publish
             |> Event.add (fun r -> this.SelectedRule <- r; this.RaisePropertyChanged(<@ this.SelectedRule @>))
 
-        ruleStore.Publish
-            |> Event.add (fun s -> this.SaveEnabled <- s.Modified; this.RaisePropertyChanged(<@ this.SaveCommand @>))
+        Event.pair
+            (RuleStore.Zero, ruleStoreSaved.Publish)
+            (RuleStore.Zero, ruleStore.Publish)
+            |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2)
+            |> Event.add (fun v -> this.SaveEnabled <- v <> 0; this.RaisePropertyChanged(<@ this.SaveCommand @>))
 
         Async.Start (User.get () |> loadDataAsync)
 
