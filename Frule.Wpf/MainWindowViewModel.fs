@@ -2,11 +2,6 @@
 
 open FSharp.ViewModule
 
-type RuleStore = {
-    Modified: bool;
-    Model: Rule list;
-}
-
 type DisplayRuleState = {
     RuleStore: RuleStore;
     SelectedFolder: Folder;
