@@ -40,7 +40,7 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </DockPanel>
-        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding DisplayRule}">
+        <ListBox x:Name="listBox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding DisplayRules}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction

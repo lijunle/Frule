@@ -2,6 +2,15 @@
 
 open Microsoft.Exchange.WebServices.Data
 
+let Zero = {
+    Instance = null;
+    Id = null;
+    Name = "";
+    FolderId = null;
+    FromAddresses = [];
+    SentToAddresses = []
+}
+
 let isRule (rule : Rule) =
     isNull rule.Actions ||
     isNull rule.Actions.MoveToFolder ||

@@ -2,44 +2,31 @@
 
 open FSharp.ViewModule
 
-type DisplayRuleState = {
-    RuleStore: RuleStore;
-    SelectedFolder: Folder;
-}
+type ViewModelSuperBase() as this =
+    inherit ViewModelBase()
 
-type DisplayRuleChangeType =
-    | RuleStoreUpdated of RuleStore
-    | SelectedFolderChagned of Folder
-
-module DisplayRule =
-    let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
-    let loadingRuleStore = { Rules = []; }
-    let loadingState = { RuleStore = loadingRuleStore; SelectedFolder = loadingFolder; }
-
-    let update s t =
-        match t with
-        | RuleStoreUpdated r -> { s with RuleStore = r }
-        | SelectedFolderChagned f -> { s with SelectedFolder = f }
-
-    let toList s =
-        s.RuleStore.Rules |> List.filter (fun r -> r.FolderId = s.SelectedFolder.Id)
+    member __.SuperEvent<'t>(initialValue, expr : Quotations.Expr) =
+        let event = SuperEvent<'t>(initialValue)
+        event.Publish.Add (fun _ -> this.RaisePropertyChanged(expr))
+        event
 
 type MainWindowViewModel() as this =
-    inherit ViewModelBase()
+    inherit ViewModelSuperBase()
 
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
     let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
     let inboxFolder = this.Factory.Backing(<@ this.InboxFolder @>, loadingFolder)
 
-    let emptyRule = { Instance = null; Id = null; Name = ""; FolderId = null; FromAddresses = []; SentToAddresses = [] }
-    let ruleStore = Event<RuleStore>()
-    let ruleStoreSaved = Event<RuleStore>()
-    let folderSelectedEvent = Event<Folder>()
-    let ruleSelectedEvent = Event<Rule>()
+    let ruleStore = SuperEvent<RuleStore>(RuleStore.Zero)
+    let ruleStoreSaved = SuperEvent<RuleStore>(RuleStore.Zero)
+    let selectedFolder = SuperEvent<Folder>(loadingFolder)
+    let selectedRule = this.SuperEvent<Rule>(Rule.Zero, <@ this.SelectedRule @>)
+    let displayRules = this.SuperEvent<Rule list>([], <@ this.DisplayRules @>)
+    let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
     let updateRuleName (ruleName : string) =
         let newRule = Rule.updateName ruleName this.SelectedRule
-        let newRules = this.RuleStore.Rules |> List.map (fun r -> if r.Id = this.SelectedRule.Id then newRule else r)
+        let newRules = ruleStore.Value.Rules |> List.map (fun r -> if r.Id = this.SelectedRule.Id then newRule else r)
         let newState = { Rules = newRules; }
         ruleStore.Trigger newState
 
@@ -63,48 +50,31 @@ type MainWindowViewModel() as this =
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
         let user = User.get ()
-        let modifiedRules = RuleStore.getDiffRules this.LastSavedRuleStore this.RuleStore
+        let modifiedRules = RuleStore.getDiffRules ruleStoreSaved.Value ruleStore.Value
         Rule.saveToServer user modifiedRules |> ignore
-
-        let store = this.RuleStore
-        ruleStore.Trigger store
-        ruleStoreSaved.Trigger store
+        ruleStoreSaved.Trigger ruleStore.Value
     }
 
     do
-        Event.merge
-            (ruleStore.Publish |> Event.map RuleStoreUpdated)
-            (folderSelectedEvent.Publish |> Event.map SelectedFolderChagned)
-            |> Event.scan DisplayRule.update DisplayRule.loadingState
-            |> Event.map DisplayRule.toList
-            |> Event.add (fun r -> this.DisplayRule <- r; this.RaisePropertyChanged(<@ this.DisplayRule @>))
+        selectedFolder.Publish
+            |> Event.add (fun _ -> selectedRule.Trigger Rule.Zero)
 
-        ruleStoreSaved.Publish
-            |> Event.add (fun s -> this.LastSavedRuleStore <- s)
+        SuperEvent.zip ruleStore selectedFolder
+            |> Event.map (fun (s, f) -> s.Rules |> List.filter (fun r -> r.FolderId = f.Id))
+            |> Event.add (displayRules.Trigger)
 
-        ruleStore.Publish
-            |> Event.add (fun s -> this.RuleStore <- s)
-
-        ruleSelectedEvent.Publish
-            |> Event.add (fun r -> this.SelectedRule <- r; this.RaisePropertyChanged(<@ this.SelectedRule @>))
-
-        Event.pair
-            (RuleStore.Zero, ruleStoreSaved.Publish)
-            (RuleStore.Zero, ruleStore.Publish)
-            |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2)
-            |> Event.add (fun v -> this.SaveEnabled <- v <> 0; this.RaisePropertyChanged(<@ this.SaveCommand @>))
+        SuperEvent.zip ruleStoreSaved ruleStore
+            |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)
+            |> Event.add (saveEnabled.Trigger)
 
         Async.Start (User.get () |> loadDataAsync)
 
-    member val RuleStore = DisplayRule.loadingRuleStore with get, set
-    member val LastSavedRuleStore = DisplayRule.loadingRuleStore with get, set
-    member val DisplayRule = [] with get, set
-    member val SelectedRule = emptyRule with get, set
-    member val SaveEnabled = false with get, set
+    member __.DisplayRules with get() = displayRules.Value
+    member __.SelectedRule with get() = selectedRule.Value
 
     member this.InboxFolder with get() = [inboxFolder.Value]
     member this.LoginCommand = this.Factory.CommandAsync(login)
-    member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> this.SaveEnabled)
-    member this.SelectFolderCommand = this.Factory.CommandSyncParam(folderSelectedEvent.Trigger)
-    member this.SelectRuleCommand = this.Factory.CommandSyncParam(ruleSelectedEvent.Trigger)
+    member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
+    member this.SelectFolderCommand = this.Factory.CommandSyncParam(selectedFolder.Trigger)
+    member this.SelectRuleCommand = this.Factory.CommandSyncParam(selectedRule.Trigger)
     member this.ChangeRuleNameCommand = this.Factory.CommandSyncParam(updateRuleName)
