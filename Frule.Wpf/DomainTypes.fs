@@ -2,5 +2,5 @@
 module DomainTypes
 
 type RuleStore = {
-    Model: Rule list;
+    Rules: Rule list;
 }

@@ -13,7 +13,7 @@ type DisplayRuleChangeType =
 
 module DisplayRule =
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
-    let loadingRuleStore = { Model = []; }
+    let loadingRuleStore = { Rules = []; }
     let loadingState = { RuleStore = loadingRuleStore; SelectedFolder = loadingFolder; }
 
     let update s t =
@@ -22,7 +22,7 @@ module DisplayRule =
         | SelectedFolderChagned f -> { s with SelectedFolder = f }
 
     let toList s =
-        s.RuleStore.Model |> List.filter (fun r -> r.FolderId = s.SelectedFolder.Id)
+        s.RuleStore.Rules |> List.filter (fun r -> r.FolderId = s.SelectedFolder.Id)
 
 type MainWindowViewModel() as this =
     inherit ViewModelBase()
@@ -39,8 +39,8 @@ type MainWindowViewModel() as this =
 
     let updateRuleName (ruleName : string) =
         let newRule = Rule.updateName ruleName this.SelectedRule
-        let newRules = this.RuleStore.Model |> List.map (fun r -> if r.Id = this.SelectedRule.Id then newRule else r)
-        let newState = { Model = newRules; }
+        let newRules = this.RuleStore.Rules |> List.map (fun r -> if r.Id = this.SelectedRule.Id then newRule else r)
+        let newState = { Rules = newRules; }
         ruleStore.Trigger newState
 
     let loadDataAsync user = async {
@@ -50,7 +50,7 @@ type MainWindowViewModel() as this =
         inboxFolder.Value <- Result.orDefault folderResult loginErrorFolder
 
         let rulesResult = User.getRules user
-        let store = { Model = Result.orDefault rulesResult []; }
+        let store = { Rules = Result.orDefault rulesResult []; }
         ruleStore.Trigger store
         ruleStoreSaved.Trigger store
     }
