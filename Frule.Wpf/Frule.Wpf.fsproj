@@ -57,7 +57,6 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
-    <Compile Include="Common/Event.fs" />
     <Compile Include="Common/SuperEvent.fs" />
     <Compile Include="Common/DomainTypes.fs" />
     <Compile Include="Common/User.fs" />
