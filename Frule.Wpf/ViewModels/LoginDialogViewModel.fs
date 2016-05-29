@@ -10,7 +10,7 @@ type LoginDialogViewModel(store : Store) as this =
     let password = this.Factory.Backing(<@ this.Password @>, "")
     let state = this.Factory.Backing(<@ this.State @>, "")
 
-    let login _ (dialog : Window) =
+    let login ui (dialog : Window) =
         async {
             do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
             state.Value <- "Start login..."
@@ -20,6 +20,8 @@ type LoginDialogViewModel(store : Store) as this =
                 state.Value <- "Login successful."
                 User.set v
                 store.User.Trigger (Some v)
+
+                do! Async.SwitchToContext ui // Otherwise, it cannot be close
                 dialog.Close()
             | Failure e ->
                 state.Value <- sprintf "Login failed. %s" e.Message

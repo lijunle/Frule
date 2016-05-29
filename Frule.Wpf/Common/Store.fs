@@ -7,7 +7,7 @@ let create () = {
     SavedRules = SuperEvent<Rule list>([]);
     SelectedRule = SuperEvent<Rule>(Rule.Zero);
     SelectedFolder = SuperEvent<Folder>(Folder.Loading);
-    SaveButtonEnabled = SuperEvent<bool>(false)
+    SaveButtonEnabled = SuperEvent<bool>(false);
 }
 
 let loadAsync store = async {
