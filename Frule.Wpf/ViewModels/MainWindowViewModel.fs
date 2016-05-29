@@ -51,9 +51,10 @@ type MainWindowViewModel() as this =
         selectedFolder.Publish
             |> Event.add (fun _ -> selectedRule.Trigger RuleInfoViewModel.Zero)
 
-        SuperEvent.zip3 ruleStoreSaved ruleStore selectedFolder
-            |> Event.map (RuleListViewModel.FilterRules >> List.map RuleItemViewModel.create)
-            |> Event.add (RuleListViewModel.Create selectRule >> displayRules.Trigger)
+        SuperEvent.zip4 ruleStoreSaved ruleStore selectedFolder selectedRule
+            |> Event.map (fun (a, b, c, d) -> (a, b, c, d.Rule))
+            |> Event.map (RuleListViewModel.Create selectRule)
+            |> Event.add (displayRules.Trigger)
 
         SuperEvent.zip ruleStoreSaved ruleStore
             |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)
