@@ -20,13 +20,12 @@ type MainWindowViewModel() as this =
     let ruleStoreSaved = SuperEvent<RuleStore>(RuleStore.Zero)
     let selectedFolder = SuperEvent<Folder>(loadingFolder)
     let inboxFolder = this.SuperEvent<Folder list>([loadingFolder], <@ this.InboxFolder @>)
-    let selectedRule = this.SuperEvent<Rule>(Rule.Zero, <@ this.SelectedRule @>)
+    let selectedRule = this.SuperEvent<RuleInfoViewModel>(RuleInfoViewModel.Zero, <@ this.SelectedRule @>)
     let displayRules = this.SuperEvent<Rule list>([], <@ this.DisplayRules @>)
     let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
-    let updateRuleName (ruleName : string) =
-        let newRule = Rule.updateName ruleName this.SelectedRule
-        let newRules = ruleStore.Value.Rules |> List.map (fun r -> if r.Id = this.SelectedRule.Id then newRule else r)
+    let updateRule (rule : Rule) =
+        let newRules = ruleStore.Value.Rules |> List.map (fun r -> if r.Id = selectedRule.Value.Rule.Id then rule else r)
         let newState = { Rules = newRules; }
         ruleStore.Trigger newState
 
@@ -57,7 +56,7 @@ type MainWindowViewModel() as this =
 
     do
         selectedFolder.Publish
-            |> Event.add (fun _ -> selectedRule.Trigger Rule.Zero)
+            |> Event.add (fun _ -> selectedRule.Trigger RuleInfoViewModel.Zero)
 
         SuperEvent.zip ruleStore selectedFolder
             |> Event.map (fun (s, f) -> s.Rules |> List.filter (fun r -> r.FolderId = f.Id))
@@ -76,5 +75,4 @@ type MainWindowViewModel() as this =
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(selectedFolder.Trigger)
-    member this.SelectRuleCommand = this.Factory.CommandSyncParam(selectedRule.Trigger)
-    member this.ChangeRuleNameCommand = this.Factory.CommandSyncParam(updateRuleName)
+    member this.SelectRuleCommand = this.Factory.CommandSyncParam(RuleInfoViewModel.Create updateRule >> selectedRule.Trigger)
