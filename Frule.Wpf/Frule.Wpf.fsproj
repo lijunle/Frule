@@ -57,6 +57,7 @@
     <Compile Include="Common/SuperEvent.fs" />
     <Compile Include="Common/DomainTypes.fs" />
     <Compile Include="Common/User.fs" />
+    <Compile Include="Common/Store.fs" />
     <Compile Include="Common/RuleStore.fs" />
     <Compile Include="Common/ViewModelSuperBase.fs" />
     <Resource Include="Views/LoginDialog.xaml" />
