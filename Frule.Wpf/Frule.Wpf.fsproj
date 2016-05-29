@@ -65,6 +65,8 @@
     <Resource Include="LoginDialog.xaml" />
     <Compile Include="LoginDialog.xaml.fs" />
     <Compile Include="LoginDialogViewModel.fs" />
+    <Resource Include="RuleInfo.xaml" />
+    <Compile Include="RuleInfo.xaml.fs" />
     <Resource Include="MainWindow.xaml" />
     <Compile Include="MainWindow.xaml.fs" />
     <Compile Include="MainWindowViewModel.fs" />
