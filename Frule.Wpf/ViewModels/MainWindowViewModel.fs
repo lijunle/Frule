@@ -21,13 +21,16 @@ type MainWindowViewModel() as this =
     let selectedFolder = SuperEvent<Folder>(loadingFolder)
     let inboxFolder = this.SuperEvent<Folder list>([loadingFolder], <@ this.InboxFolder @>)
     let selectedRule = this.SuperEvent<RuleInfoViewModel>(RuleInfoViewModel.Zero, <@ this.SelectedRule @>)
-    let displayRules = this.SuperEvent<Rule list>([], <@ this.DisplayRules @>)
+    let displayRules = this.SuperEvent<RuleListViewModel>(RuleListViewModel.Zero, <@ this.DisplayRules @>)
     let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
     let updateRule (rule : Rule) =
         let newRules = ruleStore.Value.Rules |> List.map (fun r -> if r.Id = selectedRule.Value.Rule.Id then rule else r)
         let newState = { Rules = newRules; }
         ruleStore.Trigger newState
+
+    let selectRule =
+        RuleInfoViewModel.Create updateRule >> selectedRule.Trigger
 
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
@@ -58,9 +61,9 @@ type MainWindowViewModel() as this =
         selectedFolder.Publish
             |> Event.add (fun _ -> selectedRule.Trigger RuleInfoViewModel.Zero)
 
-        SuperEvent.zip ruleStore selectedFolder
-            |> Event.map (fun (s, f) -> s.Rules |> List.filter (fun r -> r.FolderId = f.Id))
-            |> Event.add (displayRules.Trigger)
+        SuperEvent.zip3 ruleStoreSaved ruleStore selectedFolder
+            |> Event.map (RuleListViewModel.FilterRules >> List.map RuleItemViewModel.create)
+            |> Event.add (RuleListViewModel.Create selectRule >> displayRules.Trigger)
 
         SuperEvent.zip ruleStoreSaved ruleStore
             |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)
@@ -75,4 +78,3 @@ type MainWindowViewModel() as this =
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(selectedFolder.Trigger)
-    member this.SelectRuleCommand = this.Factory.CommandSyncParam(RuleInfoViewModel.Create updateRule >> selectedRule.Trigger)

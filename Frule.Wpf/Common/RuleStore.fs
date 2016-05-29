@@ -12,6 +12,4 @@ let compare s1 s2 =
 let getDiffRules s1 s2 =
     let list1 = s1.Rules
     let list2 = s2.Rules
-    List.zip list1 list2
-    |> List.filter (fun (r1, r2) -> r1 <> r2)
-    |> List.map (fun (r1, r2) -> r2)
+    list2 |> List.filter (fun r -> not (List.contains r list1))
