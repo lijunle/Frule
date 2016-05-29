@@ -20,11 +20,7 @@ type MainWindowViewModel(store : Store) as this =
 
     do
         store.InboxFolder.Publish.Add(fun _ -> this.RaisePropertyChanged(<@ this.InboxFolder @>))
-        store.SelectedRule.Publish.Add (fun _ -> this.RaisePropertyChanged(<@ this.SelectedRule @>))
         store.SaveButtonEnabled.Publish.Add(fun _ -> this.RaisePropertyChanged(<@ this.SaveCommand @>))
-
-        store.SelectedFolder.Publish
-            |> Event.add (fun _ -> store.SelectedRule.Trigger Rule.Zero)
 
         SuperEvent.zip store.SavedRules store.Rules
             |> Event.map (fun (v1, v2) -> Store.compare v1 v2 <> 0)
@@ -32,7 +28,7 @@ type MainWindowViewModel(store : Store) as this =
 
     member __.InboxFolder with get() = store.InboxFolder.Value
     member __.DisplayRules = RuleListViewModel store
-    member __.SelectedRule with get() = RuleInfoViewModel store
+    member __.SelectedRule = RuleInfoViewModel store
 
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> store.SaveButtonEnabled.Value)
