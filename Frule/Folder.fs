@@ -2,6 +2,18 @@
 
 open Microsoft.Exchange.WebServices.Data
 
+let Loading = {
+    Id = null;
+    Name = "Loading";
+    Children = [];
+}
+
+let LoginError = {
+    Id = null;
+    Name= "Login Error";
+    Children= [];
+}
+
 let buildFolderHierarchy (inboxId, inboxName) (folders : Folder list) =
     let rec loop (folderId, folderName) =
         let children =

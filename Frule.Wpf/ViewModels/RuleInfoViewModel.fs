@@ -9,8 +9,8 @@ type RuleInfoViewModel(store : Store) =
 
     let updateRule (rule : Rule) =
         let updateTargetRule (r : Rule) = if r.Id = store.SelectedRule.Value.Id then rule else r
-        let newRules = store.Rules'.Value |> List.map updateTargetRule
-        store.Rules'.Trigger newRules
+        let newRules = store.Rules.Value |> List.map updateTargetRule
+        store.Rules.Trigger newRules
 
     let updateRuleName (ruleName : string) =
         Rule.updateName ruleName selectedRule |> updateRule

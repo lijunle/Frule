@@ -1,12 +1,11 @@
 ﻿[<AutoOpen>]
 module DomainTypes
 
-type RuleStore = {
-    Rules: Rule list;
-}
-
 type Store = {
-    Rules': SuperEvent<Rule list>; // TODO pending to change back to Rules
+    InboxFolder: SuperEvent<Folder list>;
+    Rules: SuperEvent<Rule list>;
     SavedRules: SuperEvent<Rule list>;
     SelectedRule: SuperEvent<Rule>;
+    SelectedFolder: SuperEvent<Folder>;
+    SaveButtonEnabled: SuperEvent<bool>;
 }

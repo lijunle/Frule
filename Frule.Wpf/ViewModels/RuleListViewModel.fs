@@ -22,16 +22,14 @@ module RuleItemViewModel =
         let displayPairs = List.zip displayRules displayModifiers
         displayPairs |> List.map create
 
-type RuleListViewModel(selectRule : (Rule -> unit), rules : RuleItemViewModel list, selectedRule : Rule) =
+type RuleListViewModel(store : Store) =
     inherit ViewModelBase()
 
-    static member Zero = RuleListViewModel(ignore, [], Rule.Zero)
+    let savedRules = store.SavedRules.Value
+    let currentRules = store.Rules.Value
+    let selectedRule = store.SelectedFolder.Value
 
-    static member Create f (savedStore, currentStore, selectedFolder, selectedRule : Rule) =
-        let list = RuleItemViewModel.constructList savedStore currentStore selectedFolder
-        RuleListViewModel(f, list, selectedRule)
+    member __.List = RuleItemViewModel.constructList savedRules currentRules selectedRule
+    member __.SelectedRuleId = store.SelectedRule.Value.Id
 
-    member __.List = rules
-    member __.SelectedRuleId = selectedRule.Id
-
-    member this.SelectRuleCommand = this.Factory.CommandSyncParam(selectRule)
+    member this.SelectRuleCommand = this.Factory.CommandSyncParam(store.SelectedRule.Trigger)
