@@ -34,7 +34,7 @@ type RuleListViewModel(store : Store) as this =
         RuleItemViewModel.constructList savedRules.Value currentRules.Value selectedFolder.Value
 
     do
-        SuperEvent.zip4 savedRules currentRules selectedFolder selectedRule
+        SuperEvent.any4 savedRules currentRules selectedFolder selectedRule
             |> Event.add (fun _ ->
                 this.RaisePropertyChanged(<@ this.List @>)
                 this.RaisePropertyChanged(<@ this.SelectedRuleId @>))
