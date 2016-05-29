@@ -2,7 +2,7 @@
 module DomainTypes
 
 type Store = {
-    Rules': SuperEvent<Rule list>; // TODO pending to change back to Rules
+    Rules: SuperEvent<Rule list>;
     SavedRules: SuperEvent<Rule list>;
     SelectedRule: SuperEvent<Rule>;
     SelectedFolder: SuperEvent<Folder>;

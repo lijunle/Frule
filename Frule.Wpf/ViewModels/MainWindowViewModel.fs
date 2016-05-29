@@ -18,7 +18,7 @@ type MainWindowViewModel() as this =
 
         let rulesResult = User.getRules user
         let loadedRules = Result.orDefault rulesResult []
-        store.Rules'.Trigger loadedRules
+        store.Rules.Trigger loadedRules
         store.SavedRules.Trigger loadedRules
     }
 
@@ -30,21 +30,21 @@ type MainWindowViewModel() as this =
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
         let user = User.get ()
-        let modifiedRules = Store.getDiffRules store.SavedRules.Value store.Rules'.Value
+        let modifiedRules = Store.getDiffRules store.SavedRules.Value store.Rules.Value
         Rule.saveToServer user modifiedRules |> ignore
-        store.SavedRules.Trigger store.Rules'.Value
+        store.SavedRules.Trigger store.Rules.Value
     }
 
     do
         store.SelectedRule.Publish.Add (fun _ -> this.RaisePropertyChanged(<@ this.SelectedRule @>))
 
-        SuperEvent.zip4 store.SavedRules store.Rules' store.SelectedFolder store.SelectedRule
+        SuperEvent.zip4 store.SavedRules store.Rules store.SelectedFolder store.SelectedRule
             |> Event.add (fun _ -> this.RaisePropertyChanged(<@ this.DisplayRules @>))
 
         store.SelectedFolder.Publish
             |> Event.add (fun _ -> store.SelectedRule.Trigger Rule.Zero)
 
-        SuperEvent.zip store.SavedRules store.Rules'
+        SuperEvent.zip store.SavedRules store.Rules
             |> Event.map (fun (v1, v2) -> Store.compare v1 v2 <> 0)
             |> Event.add (saveEnabled.Trigger)
 

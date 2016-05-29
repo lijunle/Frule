@@ -26,7 +26,7 @@ type RuleListViewModel(store : Store) =
     inherit ViewModelBase()
 
     let savedRules = store.SavedRules.Value
-    let currentRules = store.Rules'.Value
+    let currentRules = store.Rules.Value
     let selectedRule = store.SelectedFolder.Value
 
     member __.List = RuleItemViewModel.constructList savedRules currentRules selectedRule

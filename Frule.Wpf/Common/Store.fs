@@ -1,7 +1,7 @@
 ﻿module Store
 
 let create () = {
-    Rules' = SuperEvent<Rule list>([]);
+    Rules = SuperEvent<Rule list>([]);
     SavedRules = SuperEvent<Rule list>([]);
     SelectedRule = SuperEvent<Rule>(Rule.Zero);
     SelectedFolder = SuperEvent<Folder>(Folder.Loading);
