@@ -8,6 +8,12 @@ let Loading = {
     Children = [];
 }
 
+let LoginError = {
+    Id = null;
+    Name= "Login Error";
+    Children= [];
+}
+
 let buildFolderHierarchy (inboxId, inboxName) (folders : Folder list) =
     let rec loop (folderId, folderName) =
         let children =

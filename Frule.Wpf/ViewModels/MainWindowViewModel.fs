@@ -3,15 +3,13 @@
 type MainWindowViewModel() as this =
     inherit ViewModelSuperBase()
 
-    let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
-
     let store = Store.create()
 
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
         let folderResult = User.getInboxFolder user
-        store.InboxFolder.Trigger (Result.orDefault folderResult loginErrorFolder |> List.singleton)
+        store.InboxFolder.Trigger (Result.orDefault folderResult Folder.LoginError |> List.singleton)
 
         let rulesResult = User.getRules user
         let loadedRules = Result.orDefault rulesResult []
