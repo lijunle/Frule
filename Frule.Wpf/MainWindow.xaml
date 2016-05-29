@@ -58,7 +58,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <view:RuleInfo/>
+            <view:RuleInfo DataContext="{Binding SelectedRule}"/>
         </ScrollViewer>
     </Grid>
 </Window>

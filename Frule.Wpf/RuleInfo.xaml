@@ -9,13 +9,13 @@
     d:DesignHeight="300"
     d:DesignWidth="500"
 >
-    <StackPanel DataContext="{Binding SelectedRule}">
+    <StackPanel>
         <Label>Name</Label>
         <TextBox x:Name="ruleName" Text="{Binding Name, Mode=OneWay}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="KeyUp">
                     <i:InvokeCommandAction
-                        Command="{Binding ElementName=ruleInfo, Path=DataContext.ChangeRuleNameCommand}"
+                        Command="{Binding ChangeNameCommand}"
                         CommandParameter="{Binding ElementName=ruleName, Path=Text}"
                     />
                 </i:EventTrigger>
