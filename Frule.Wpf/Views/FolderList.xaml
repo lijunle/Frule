@@ -8,7 +8,7 @@
     d:DesignHeight="300"
     d:DesignWidth="500"
 >
-    <TreeView x:Name="treeView" ItemsSource="{Binding InboxFolder}">
+    <TreeView x:Name="treeView" ItemsSource="{Binding List}">
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="SelectedItemChanged">
                 <i:InvokeCommandAction

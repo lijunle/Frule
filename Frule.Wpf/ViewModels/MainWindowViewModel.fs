@@ -5,10 +5,8 @@ open FSharp.ViewModule
 type MainWindowViewModel(store : Store) as this =
     inherit ViewModelBase()
 
-    let inboxFolder = store.InboxFolder
     let currentRules = store.Rules
     let savedRules = store.SavedRules
-    let selectedFolder = store.SelectedFolder
     let saveButtonEnabled = store.SaveButtonEnabled
 
     let login _ =
@@ -25,17 +23,15 @@ type MainWindowViewModel(store : Store) as this =
     }
 
     do
-        inboxFolder.Publish.Add(fun _ -> this.RaisePropertyChanged(<@ this.InboxFolder @>))
         saveButtonEnabled.Publish.Add(fun _ -> this.RaisePropertyChanged(<@ this.SaveCommand @>))
 
         SuperEvent.zip savedRules currentRules
             |> Event.map (fun (v1, v2) -> Store.compare v1 v2 <> 0)
             |> Event.add (saveButtonEnabled.Trigger)
 
-    member __.InboxFolder with get() = inboxFolder.Value
+    member __.InboxFolder = FolderListViewModel store
     member __.DisplayRules = RuleListViewModel store
     member __.SelectedRule = RuleInfoViewModel store
 
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveButtonEnabled.Value)
-    member this.SelectFolderCommand = this.Factory.CommandSyncParam(selectedFolder.Trigger)

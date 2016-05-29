@@ -69,6 +69,7 @@
     <Resource Include="Views/MainWindow.xaml" />
     <Compile Include="Views/MainWindow.xaml.fs" />
     <Compile Include="ViewModels/LoginDialogViewModel.fs" />
+    <Compile Include="ViewModels/FolderListViewModel.fs" />
     <Compile Include="ViewModels/RuleListViewModel.fs" />
     <Compile Include="ViewModels/RuleInfoViewModel.fs" />
     <Compile Include="ViewModels/MainWindowViewModel.fs" />
