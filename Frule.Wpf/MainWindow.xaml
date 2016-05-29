@@ -61,7 +61,7 @@
                 <Label>Name</Label>
                 <TextBox x:Name="ruleName" Text="{Binding Name, Mode=OneWay}">
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="LostFocus">
+                        <i:EventTrigger EventName="KeyUp">
                             <i:InvokeCommandAction
                                 Command="{Binding ElementName=window, Path=DataContext.ChangeRuleNameCommand}"
                                 CommandParameter="{Binding ElementName=ruleName, Path=Text}"
