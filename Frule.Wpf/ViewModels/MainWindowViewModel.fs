@@ -29,6 +29,9 @@ type MainWindowViewModel() as this =
         let newState = { Rules = newRules; }
         ruleStore.Trigger newState
 
+    let selectRule =
+        RuleInfoViewModel.Create updateRule >> selectedRule.Trigger
+
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
@@ -60,7 +63,7 @@ type MainWindowViewModel() as this =
 
         SuperEvent.zip ruleStore selectedFolder
             |> Event.map (fun (s, f) -> s.Rules |> List.filter (fun r -> r.FolderId = f.Id))
-            |> Event.add (RuleListViewModel >> displayRules.Trigger)
+            |> Event.add (RuleListViewModel.Create selectRule >> displayRules.Trigger)
 
         SuperEvent.zip ruleStoreSaved ruleStore
             |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)
@@ -75,4 +78,3 @@ type MainWindowViewModel() as this =
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(selectedFolder.Trigger)
-    member this.SelectRuleCommand = this.Factory.CommandSyncParam(RuleInfoViewModel.Create updateRule >> selectedRule.Trigger)

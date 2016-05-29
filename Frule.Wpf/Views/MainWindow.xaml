@@ -41,7 +41,7 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </DockPanel>
-        <view:RuleList Grid.Row="0" Grid.Column="1"/>
+        <view:RuleList Grid.Row="0" Grid.Column="1" DataContext="{Binding DisplayRules}"/>
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <view:RuleInfo DataContext="{Binding SelectedRule}"/>
         </ScrollViewer>
