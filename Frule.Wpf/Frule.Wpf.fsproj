@@ -64,6 +64,8 @@
     <Compile Include="Common/RuleStore.fs" />
     <Resource Include="Views/LoginDialog.xaml" />
     <Compile Include="Views/LoginDialog.xaml.fs" />
+    <Resource Include="Views/RuleList.xaml" />
+    <Compile Include="Views/RuleList.xaml.fs" />
     <Resource Include="Views/RuleInfo.xaml" />
     <Compile Include="Views/RuleInfo.xaml.fs" />
     <Resource Include="Views/MainWindow.xaml" />
