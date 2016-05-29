@@ -8,7 +8,12 @@
     d:DesignHeight="300"
     d:DesignWidth="500"
 >
-    <ListBox x:Name="listBox" ItemsSource="{Binding List}">
+    <ListBox
+        x:Name="listBox"
+        ItemsSource="{Binding List}"
+        SelectedValue="{Binding SelectedRuleId, Mode=OneWay}"
+        SelectedValuePath="Rule.Id"
+    >
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="SelectionChanged">
                 <i:InvokeCommandAction
