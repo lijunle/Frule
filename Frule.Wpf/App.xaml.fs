@@ -13,4 +13,5 @@ let main _ =
     let store = Store.create()
     let viewModel = MainWindowViewModel(store)
     let window = MainWindow(DataContext = viewModel)
+    Async.Start (User.get () |> Store.loadAsync store)
     App().Run(window)

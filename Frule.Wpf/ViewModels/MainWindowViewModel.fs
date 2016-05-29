@@ -3,21 +3,9 @@
 type MainWindowViewModel(store : Store) as this =
     inherit ViewModelSuperBase()
 
-    let loadDataAsync user = async {
-        do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
-
-        let folderResult = User.getInboxFolder user
-        store.InboxFolder.Trigger (Result.orDefault folderResult Folder.LoginError |> List.singleton)
-
-        let rulesResult = User.getRules user
-        let loadedRules = Result.orDefault rulesResult []
-        store.Rules.Trigger loadedRules
-        store.SavedRules.Trigger loadedRules
-    }
-
     let login _ =
         Views.LoginDialog().ShowDialog() |> ignore
-        User.get () |> loadDataAsync
+        User.get () |> Store.loadAsync store
 
     let save _ = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
@@ -42,8 +30,6 @@ type MainWindowViewModel(store : Store) as this =
         SuperEvent.zip store.SavedRules store.Rules
             |> Event.map (fun (v1, v2) -> Store.compare v1 v2 <> 0)
             |> Event.add (store.SaveButtonEnabled.Trigger)
-
-        Async.Start (User.get () |> loadDataAsync)
 
     member __.InboxFolder with get() = store.InboxFolder.Value
     member __.DisplayRules with get() = RuleListViewModel store
