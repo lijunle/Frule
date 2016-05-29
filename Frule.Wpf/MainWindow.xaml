@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:viewModel="clr-namespace:ViewModels;assembly=Frule.Wpf"
+    x:Name="window"
     Title="Frule"
     Height="600"
     Width="1000"
@@ -56,22 +57,22 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
+            <StackPanel DataContext="{Binding SelectedRule}">
                 <Label>Name</Label>
-                <TextBox x:Name="ruleName" Text="{Binding SelectedRule.Name, Mode=OneWay}">
+                <TextBox x:Name="ruleName" Text="{Binding Name, Mode=OneWay}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="LostFocus">
                             <i:InvokeCommandAction
-                                Command="{Binding ChangeRuleNameCommand}"
+                                Command="{Binding ElementName=window, Path=DataContext.ChangeRuleNameCommand}"
                                 CommandParameter="{Binding ElementName=ruleName, Path=Text}"
                             />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
                 <Label>From Addresses</Label>
-                <ListBox ItemsSource="{Binding SelectedRule.FromAddresses}"/>
+                <ListBox ItemsSource="{Binding FromAddresses}"/>
                 <Label>Sent To Addresses</Label>
-                <ListBox ItemsSource="{Binding SelectedRule.SentToAddresses}"/>
+                <ListBox ItemsSource="{Binding SentToAddresses}"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
