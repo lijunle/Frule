@@ -3,7 +3,7 @@
 open FSharp.ViewModule
 open System.Windows
 
-type LoginDialogViewModel() as this =
+type LoginDialogViewModel(store : Store) as this =
     inherit ViewModelBase()
 
     let email = this.Factory.Backing(<@ this.Email @>, "")
@@ -19,6 +19,7 @@ type LoginDialogViewModel() as this =
             | Success v ->
                 state.Value <- "Login successful."
                 User.set v
+                store.User.Trigger (Some v)
                 dialog.Close()
             | Failure e ->
                 state.Value <- sprintf "Login failed. %s" e.Message

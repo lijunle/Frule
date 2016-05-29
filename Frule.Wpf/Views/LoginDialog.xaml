@@ -1,15 +1,11 @@
 ﻿<Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:viewModel="clr-namespace:ViewModels;assembly=Frule.Wpf"
     x:Name="loginDialog"
     Title="Frule Login"
     Height="400"
     Width="600"
 >
-    <Window.DataContext>
-        <viewModel:LoginDialogViewModel/>
-    </Window.DataContext>
     <StackPanel Margin="10">
         <TextBlock Text="Frule Login"/>
         <TextBlock Text="Email"/>

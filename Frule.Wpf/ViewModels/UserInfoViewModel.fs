@@ -1,6 +1,8 @@
 ﻿namespace ViewModels
 
 open FSharp.ViewModule
+open ViewModels
+open Views
 
 type UserInfoViewModel(store : Store) as this =
     inherit ViewModelBase()
@@ -11,8 +13,9 @@ type UserInfoViewModel(store : Store) as this =
     let saveButtonEnabled = store.SaveButtonEnabled
 
     let login _ =
-        Views.LoginDialog().ShowDialog() |> ignore
-        User.get () |> user.Trigger // TODO move to LoginViewModel
+        let viewModel = LoginDialogViewModel(store)
+        let dialog = LoginDialog(DataContext = viewModel)
+        dialog.ShowDialog() |> ignore
         Store.loadAsync store
 
     let save _ = async {
