@@ -1,9 +1,7 @@
 ﻿namespace ViewModels
 
-type MainWindowViewModel() as this =
+type MainWindowViewModel(store : Store) as this =
     inherit ViewModelSuperBase()
-
-    let store = Store.create()
 
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
