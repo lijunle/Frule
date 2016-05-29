@@ -12,10 +12,6 @@ type MainWindowViewModel() as this =
     let displayRules = this.SuperEvent<RuleListViewModel>(RuleListViewModel.Zero, <@ this.DisplayRules @>)
     let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
-    let updateRule (rule : Rule) =
-        let newRules = store.Rules'.Value |> List.map (fun r -> if r.Id = store.SelectedRule.Value.Id then rule else r)
-        store.Rules'.Trigger newRules
-
     let selectRule =
         store.SelectedRule.Trigger
 
@@ -62,7 +58,7 @@ type MainWindowViewModel() as this =
 
     member __.InboxFolder with get() = inboxFolder.Value
     member __.DisplayRules with get() = displayRules.Value
-    member __.SelectedRule with get() = store.SelectedRule.Value |> RuleInfoViewModel.Create updateRule
+    member __.SelectedRule with get() = RuleInfoViewModel store
 
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)

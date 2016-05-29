@@ -2,19 +2,21 @@
 
 open FSharp.ViewModule
 
-type RuleInfoViewModel(updateRule : (Rule -> unit), rule : Rule) =
+type RuleInfoViewModel(store : Store) =
     inherit ViewModelBase()
 
+    let selectedRule = store.SelectedRule.Value
+
+    let updateRule (rule : Rule) =
+        let updateTargetRule (r : Rule) = if r.Id = store.SelectedRule.Value.Id then rule else r
+        let newRules = store.Rules'.Value |> List.map updateTargetRule
+        store.Rules'.Trigger newRules
+
     let updateRuleName (ruleName : string) =
-        Rule.updateName ruleName rule |> updateRule
+        Rule.updateName ruleName selectedRule |> updateRule
 
-    static member Zero = RuleInfoViewModel(ignore, Rule.Zero)
-    static member Create f r = RuleInfoViewModel(f, r)
-
-    member internal __.Rule = rule
-
-    member __.Name = rule.Name
-    member __.FromAddresses = rule.FromAddresses
-    member __.SentToAddresses = rule.SentToAddresses
+    member __.Name = selectedRule.Name
+    member __.FromAddresses = selectedRule.FromAddresses
+    member __.SentToAddresses = selectedRule.SentToAddresses
 
     member this.ChangeNameCommand = this.Factory.CommandSyncParam(updateRuleName)
