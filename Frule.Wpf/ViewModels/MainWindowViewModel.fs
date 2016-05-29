@@ -62,7 +62,7 @@ type MainWindowViewModel() as this =
             |> Event.add (fun _ -> selectedRule.Trigger RuleInfoViewModel.Zero)
 
         SuperEvent.zip3 ruleStoreSaved ruleStore selectedFolder
-            |> Event.map (RuleListViewModel.FilterRules)
+            |> Event.map (RuleListViewModel.FilterRules >> List.map RuleItemViewModel.create)
             |> Event.add (RuleListViewModel.Create selectRule >> displayRules.Trigger)
 
         SuperEvent.zip ruleStoreSaved ruleStore

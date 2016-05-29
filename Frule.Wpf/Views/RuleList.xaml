@@ -13,13 +13,13 @@
             <i:EventTrigger EventName="SelectionChanged">
                 <i:InvokeCommandAction
                     Command="{Binding SelectRuleCommand}"
-                    CommandParameter="{Binding ElementName=listBox, Path=SelectedItem.Item1}"
+                    CommandParameter="{Binding ElementName=listBox, Path=SelectedItem.Rule}"
                 />
             </i:EventTrigger>
         </i:Interaction.Triggers>
         <ListBox.ItemTemplate>
             <DataTemplate>
-                <TextBlock Text="{Binding Item1.Name}" FontWeight="{Binding Item2}"/>
+                <TextBlock Text="{Binding Rule.Name}" FontWeight="{Binding FontWeight}"/>
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>

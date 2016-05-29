@@ -2,7 +2,20 @@
 
 open FSharp.ViewModule
 
-type RuleListViewModel(selectRule : (Rule -> unit), rules : (Rule * bool) list) =
+[<AutoOpen>]
+module RuleList =
+    type RuleItemViewModel = {
+        Rule: Rule;
+        FontWeight: string;
+    }
+
+module RuleItemViewModel =
+    let create (rule, modified) = {
+        Rule = rule;
+        FontWeight = if modified then "Bold" else "Normal";
+    }
+
+type RuleListViewModel(selectRule : (Rule -> unit), rules : RuleItemViewModel list) =
     inherit ViewModelBase()
 
     static member Zero = RuleListViewModel(ignore, [])
@@ -14,6 +27,6 @@ type RuleListViewModel(selectRule : (Rule -> unit), rules : (Rule * bool) list) 
         let displayModifiers = displayRules |> List.map (fun r -> List.contains r modifiedRules)
         List.zip displayRules displayModifiers
 
-    member __.List = rules |> List.map (fun (r, m) -> (r, if m then "Bold" else "Normal"))
+    member __.List = rules
 
     member this.SelectRuleCommand = this.Factory.CommandSyncParam(selectRule)
