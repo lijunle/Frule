@@ -1,7 +1,9 @@
 ﻿namespace ViewModels
 
+open FSharp.ViewModule
+
 type MainWindowViewModel(store : Store) as this =
-    inherit ViewModelSuperBase()
+    inherit ViewModelBase()
 
     let login _ =
         Views.LoginDialog().ShowDialog() |> ignore
