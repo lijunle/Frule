@@ -6,21 +6,21 @@ type MainWindowViewModel() as this =
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
     let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
 
+    let store = Store.create()
     let ruleStore = SuperEvent<RuleStore>(RuleStore.Zero)
     let ruleStoreSaved = SuperEvent<RuleStore>(RuleStore.Zero)
     let selectedFolder = SuperEvent<Folder>(loadingFolder)
     let inboxFolder = this.SuperEvent<Folder list>([loadingFolder], <@ this.InboxFolder @>)
-    let selectedRule = this.SuperEvent<Rule>(Rule.Zero, <@ this.SelectedRule @>)
     let displayRules = this.SuperEvent<RuleListViewModel>(RuleListViewModel.Zero, <@ this.DisplayRules @>)
     let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
     let updateRule (rule : Rule) =
-        let newRules = ruleStore.Value.Rules |> List.map (fun r -> if r.Id = selectedRule.Value.Id then rule else r)
+        let newRules = ruleStore.Value.Rules |> List.map (fun r -> if r.Id = store.SelectedRule.Value.Id then rule else r)
         let newState = { Rules = newRules; }
         ruleStore.Trigger newState
 
     let selectRule =
-        selectedRule.Trigger
+        store.SelectedRule.Trigger
 
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
@@ -48,10 +48,12 @@ type MainWindowViewModel() as this =
     }
 
     do
-        selectedFolder.Publish
-            |> Event.add (fun _ -> selectedRule.Trigger Rule.Zero)
+        store.SelectedRule.Publish.Add (fun _ -> this.RaisePropertyChanged(<@ this.SelectedRule @>))
 
-        SuperEvent.zip4 ruleStoreSaved ruleStore selectedFolder selectedRule
+        selectedFolder.Publish
+            |> Event.add (fun _ -> store.SelectedRule.Trigger Rule.Zero)
+
+        SuperEvent.zip4 ruleStoreSaved ruleStore selectedFolder store.SelectedRule
             |> Event.map (RuleListViewModel.Create selectRule)
             |> Event.add (displayRules.Trigger)
 
@@ -63,7 +65,7 @@ type MainWindowViewModel() as this =
 
     member __.InboxFolder with get() = inboxFolder.Value
     member __.DisplayRules with get() = displayRules.Value
-    member __.SelectedRule with get() = selectedRule.Value |> RuleInfoViewModel.Create updateRule
+    member __.SelectedRule with get() = store.SelectedRule.Value |> RuleInfoViewModel.Create updateRule
 
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
