@@ -1,6 +1,7 @@
 ﻿module Store
 
 let create () = {
+    User = SuperEvent<User option>(User.get());
     InboxFolder = SuperEvent<Folder list>([Folder.Loading]);
     Rules = SuperEvent<Rule list>([]);
     SavedRules = SuperEvent<Rule list>([]);
@@ -9,16 +10,20 @@ let create () = {
     SaveButtonEnabled = SuperEvent<bool>(false)
 }
 
-let loadAsync store user = async {
+let loadAsync store = async {
     do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
-    let folderResult = User.getInboxFolder user
-    store.InboxFolder.Trigger (Result.orDefault folderResult Folder.LoginError |> List.singleton)
+    match store.User.Value with
+    | None -> ()
+    | Some user ->
+        let folderResult = User.getInboxFolder user
+        let inboxFolder = Result.orDefault folderResult Folder.LoginError
+        store.InboxFolder.Trigger (inboxFolder |> List.singleton)
 
-    let rulesResult = User.getRules user
-    let loadedRules = Result.orDefault rulesResult []
-    store.Rules.Trigger loadedRules
-    store.SavedRules.Trigger loadedRules
+        let rulesResult = User.getRules user
+        let loadedRules = Result.orDefault rulesResult []
+        store.Rules.Trigger loadedRules
+        store.SavedRules.Trigger loadedRules
 }
 
 let compare list1 list2 =

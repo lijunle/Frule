@@ -5,21 +5,25 @@ open FSharp.ViewModule
 type UserInfoViewModel(store : Store) as this =
     inherit ViewModelBase()
 
+    let user = store.User
     let currentRules = store.Rules
     let savedRules = store.SavedRules
     let saveButtonEnabled = store.SaveButtonEnabled
 
     let login _ =
         Views.LoginDialog().ShowDialog() |> ignore
-        User.get () |> Store.loadAsync store
+        User.get () |> user.Trigger // TODO move to LoginViewModel
+        Store.loadAsync store
 
     let save _ = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
-        let user = User.get ()
-        let modifiedRules = Store.getDiffRules savedRules.Value currentRules.Value
-        Rule.saveToServer user modifiedRules |> ignore
-        savedRules.Trigger currentRules.Value
+        match user.Value with
+        | None -> ()
+        | Some user ->
+            let modifiedRules = Store.getDiffRules savedRules.Value currentRules.Value
+            Rule.saveToServer user modifiedRules |> ignore
+            savedRules.Trigger currentRules.Value
     }
 
     do

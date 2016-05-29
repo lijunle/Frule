@@ -11,9 +11,9 @@ let get () =
         let email = data.[0]
         let password = data.[1]
         let serviceUrl = data.[2]
-        { Email = email; Password = password; ServiceUrl = Uri(serviceUrl) }
+        Some { Email = email; Password = password; ServiceUrl = Uri(serviceUrl) }
     with _ ->
-        { Email = "invalid"; Password = ""; ServiceUrl = Uri("http://invalid") }
+        None
 
 let set user =
     try

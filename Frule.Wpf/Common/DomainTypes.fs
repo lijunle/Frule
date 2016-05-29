@@ -2,6 +2,7 @@
 module DomainTypes
 
 type Store = {
+    User: SuperEvent<User option>;
     InboxFolder: SuperEvent<Folder list>;
     Rules: SuperEvent<Rule list>;
     SavedRules: SuperEvent<Rule list>;
