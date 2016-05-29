@@ -3,18 +3,15 @@
 type MainWindowViewModel() as this =
     inherit ViewModelSuperBase()
 
-    let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
     let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
 
     let store = Store.create()
-    let inboxFolder = this.SuperEvent<Folder list>([loadingFolder], <@ this.InboxFolder @>)
-    let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
         let folderResult = User.getInboxFolder user
-        inboxFolder.Trigger (Result.orDefault folderResult loginErrorFolder |> List.singleton)
+        store.InboxFolder.Trigger (Result.orDefault folderResult loginErrorFolder |> List.singleton)
 
         let rulesResult = User.getRules user
         let loadedRules = Result.orDefault rulesResult []
@@ -36,7 +33,9 @@ type MainWindowViewModel() as this =
     }
 
     do
+        store.InboxFolder.Publish.Add(fun _ -> this.RaisePropertyChanged(<@ this.InboxFolder @>))
         store.SelectedRule.Publish.Add (fun _ -> this.RaisePropertyChanged(<@ this.SelectedRule @>))
+        store.SaveButtonEnabled.Publish.Add(fun _ -> this.RaisePropertyChanged(<@ this.SaveCommand @>))
 
         SuperEvent.zip4 store.SavedRules store.Rules store.SelectedFolder store.SelectedRule
             |> Event.add (fun _ -> this.RaisePropertyChanged(<@ this.DisplayRules @>))
@@ -46,14 +45,14 @@ type MainWindowViewModel() as this =
 
         SuperEvent.zip store.SavedRules store.Rules
             |> Event.map (fun (v1, v2) -> Store.compare v1 v2 <> 0)
-            |> Event.add (saveEnabled.Trigger)
+            |> Event.add (store.SaveButtonEnabled.Trigger)
 
         Async.Start (User.get () |> loadDataAsync)
 
-    member __.InboxFolder with get() = inboxFolder.Value
+    member __.InboxFolder with get() = store.InboxFolder.Value
     member __.DisplayRules with get() = RuleListViewModel store
     member __.SelectedRule with get() = RuleInfoViewModel store
 
     member this.LoginCommand = this.Factory.CommandAsync(login)
-    member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
+    member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> store.SaveButtonEnabled.Value)
     member this.SelectFolderCommand = this.Factory.CommandSyncParam(store.SelectedFolder.Trigger)

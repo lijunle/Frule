@@ -1,10 +1,12 @@
 ﻿module Store
 
 let create () = {
+    InboxFolder = SuperEvent<Folder list>([Folder.Loading]);
     Rules = SuperEvent<Rule list>([]);
     SavedRules = SuperEvent<Rule list>([]);
     SelectedRule = SuperEvent<Rule>(Rule.Zero);
     SelectedFolder = SuperEvent<Folder>(Folder.Loading);
+    SaveButtonEnabled = SuperEvent<bool>(false)
 }
 
 let compare list1 list2 =
