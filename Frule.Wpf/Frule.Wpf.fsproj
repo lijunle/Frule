@@ -74,6 +74,7 @@
     <Compile Include="ViewModels/FolderListViewModel.fs" />
     <Compile Include="ViewModels/RuleListViewModel.fs" />
     <Compile Include="ViewModels/RuleInfoViewModel.fs" />
+    <Compile Include="ViewModels/UserInfoViewModel.fs" />
     <Compile Include="ViewModels/MainWindowViewModel.fs" />
     <Content Include="packages.config" />
     <Compile Include="AssemblyInfo.fs" />
