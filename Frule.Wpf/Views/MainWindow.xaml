@@ -3,14 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:view="clr-namespace:Views;assembly=Frule.Wpf"
-    xmlns:viewModel="clr-namespace:ViewModels;assembly=Frule.Wpf"
     Title="Frule"
     Height="600"
     Width="1000"
 >
-    <Window.DataContext>
-        <viewModel:MainWindowViewModel/>
-    </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>

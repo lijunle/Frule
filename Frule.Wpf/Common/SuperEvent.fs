@@ -10,6 +10,12 @@ type SuperEvent<'t>(initialValue) as this =
 
     member __.Value with get () = value
 
+let any4 (e1 : SuperEvent<'a>) (e2 : SuperEvent<'b>) (e3 : SuperEvent<'c>) (e4 : SuperEvent<'d>) =
+    (e1.Publish |> Event.map ignore)
+        |> Event.merge (e2.Publish |> Event.map ignore)
+        |> Event.merge (e3.Publish |> Event.map ignore)
+        |> Event.merge (e4.Publish |> Event.map ignore)
+
 let zip (e1 : SuperEvent<'a>) (e2 : SuperEvent<'b>) =
     let mutable v1 = e1.Value
     let mutable v2 = e2.Value
