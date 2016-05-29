@@ -6,21 +6,14 @@ type MainWindowViewModel() as this =
     let loadingFolder = { Id = null; Name= "Loading"; Children= []; }
     let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
 
-    let ruleStore = SuperEvent<RuleStore>(RuleStore.Zero)
-    let ruleStoreSaved = SuperEvent<RuleStore>(RuleStore.Zero)
+    let store = Store.create()
     let selectedFolder = SuperEvent<Folder>(loadingFolder)
     let inboxFolder = this.SuperEvent<Folder list>([loadingFolder], <@ this.InboxFolder @>)
-    let selectedRule = this.SuperEvent<RuleInfoViewModel>(RuleInfoViewModel.Zero, <@ this.SelectedRule @>)
     let displayRules = this.SuperEvent<RuleListViewModel>(RuleListViewModel.Zero, <@ this.DisplayRules @>)
     let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
-    let updateRule (rule : Rule) =
-        let newRules = ruleStore.Value.Rules |> List.map (fun r -> if r.Id = selectedRule.Value.Rule.Id then rule else r)
-        let newState = { Rules = newRules; }
-        ruleStore.Trigger newState
-
     let selectRule =
-        RuleInfoViewModel.Create updateRule >> selectedRule.Trigger
+        store.SelectedRule.Trigger
 
     let loadDataAsync user = async {
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
@@ -29,9 +22,9 @@ type MainWindowViewModel() as this =
         inboxFolder.Trigger (Result.orDefault folderResult loginErrorFolder |> List.singleton)
 
         let rulesResult = User.getRules user
-        let store = { Rules = Result.orDefault rulesResult []; }
-        ruleStore.Trigger store
-        ruleStoreSaved.Trigger store
+        let loadedRules = Result.orDefault rulesResult []
+        store.Rules'.Trigger loadedRules
+        store.SavedRules.Trigger loadedRules
     }
 
     let login _ =
@@ -42,29 +35,30 @@ type MainWindowViewModel() as this =
         do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
 
         let user = User.get ()
-        let modifiedRules = RuleStore.getDiffRules ruleStoreSaved.Value ruleStore.Value
+        let modifiedRules = Store.getDiffRules store.SavedRules.Value store.Rules'.Value
         Rule.saveToServer user modifiedRules |> ignore
-        ruleStoreSaved.Trigger ruleStore.Value
+        store.SavedRules.Trigger store.Rules'.Value
     }
 
     do
-        selectedFolder.Publish
-            |> Event.add (fun _ -> selectedRule.Trigger RuleInfoViewModel.Zero)
+        store.SelectedRule.Publish.Add (fun _ -> this.RaisePropertyChanged(<@ this.SelectedRule @>))
 
-        SuperEvent.zip4 ruleStoreSaved ruleStore selectedFolder selectedRule
-            |> Event.map (fun (a, b, c, d) -> (a, b, c, d.Rule))
+        selectedFolder.Publish
+            |> Event.add (fun _ -> store.SelectedRule.Trigger Rule.Zero)
+
+        SuperEvent.zip4 store.SavedRules store.Rules' selectedFolder store.SelectedRule
             |> Event.map (RuleListViewModel.Create selectRule)
             |> Event.add (displayRules.Trigger)
 
-        SuperEvent.zip ruleStoreSaved ruleStore
-            |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)
+        SuperEvent.zip store.SavedRules store.Rules'
+            |> Event.map (fun (v1, v2) -> Store.compare v1 v2 <> 0)
             |> Event.add (saveEnabled.Trigger)
 
         Async.Start (User.get () |> loadDataAsync)
 
     member __.InboxFolder with get() = inboxFolder.Value
     member __.DisplayRules with get() = displayRules.Value
-    member __.SelectedRule with get() = selectedRule.Value
+    member __.SelectedRule with get() = RuleInfoViewModel store
 
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
