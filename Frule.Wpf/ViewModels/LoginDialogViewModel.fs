@@ -3,14 +3,14 @@
 open FSharp.ViewModule
 open System.Windows
 
-type LoginDialogViewModel() as this =
+type LoginDialogViewModel(store : Store) as this =
     inherit ViewModelBase()
 
     let email = this.Factory.Backing(<@ this.Email @>, "")
     let password = this.Factory.Backing(<@ this.Password @>, "")
     let state = this.Factory.Backing(<@ this.State @>, "")
 
-    let login _ (dialog : Window) =
+    let login ui (dialog : Window) =
         async {
             do! Async.SwitchToThreadPool () // TODO Make native async operators and avoid this
             state.Value <- "Start login..."
@@ -19,6 +19,9 @@ type LoginDialogViewModel() as this =
             | Success v ->
                 state.Value <- "Login successful."
                 User.set v
+                store.User.Trigger (Some v)
+
+                do! Async.SwitchToContext ui // Otherwise, it cannot be close
                 dialog.Close()
             | Failure e ->
                 state.Value <- sprintf "Login failed. %s" e.Message
