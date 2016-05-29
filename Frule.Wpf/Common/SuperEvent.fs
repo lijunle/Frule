@@ -17,3 +17,15 @@ let zip (e1 : SuperEvent<'a>) (e2 : SuperEvent<'b>) =
         (e1.Publish |> Event.map (fun v -> v1 <- v))
         (e2.Publish |> Event.map (fun v -> v2 <- v))
         |> Event.map (fun _ -> (v1, v2))
+
+let zip3 (e1 : SuperEvent<'a>) (e2 : SuperEvent<'b>) (e3 : SuperEvent<'c>) =
+    let mutable v1 = e1.Value
+    let mutable v2 = e2.Value
+    let mutable v3 = e3.Value
+    let s1 = e1.Publish |> Event.map (fun v -> v1 <- v)
+    let s2 = e2.Publish |> Event.map (fun v -> v2 <- v)
+    let s3 = e3.Publish |> Event.map (fun v -> v3 <- v)
+    s1
+        |> Event.merge s2
+        |> Event.merge s3
+        |> Event.map (fun _ -> (v1, v2, v3))
