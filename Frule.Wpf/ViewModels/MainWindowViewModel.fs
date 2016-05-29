@@ -7,7 +7,6 @@ type MainWindowViewModel() as this =
     let loginErrorFolder = { Id = null; Name= "Login Error"; Children= []; }
 
     let store = Store.create()
-    let selectedFolder = SuperEvent<Folder>(loadingFolder)
     let inboxFolder = this.SuperEvent<Folder list>([loadingFolder], <@ this.InboxFolder @>)
     let displayRules = this.SuperEvent<RuleListViewModel>(RuleListViewModel.Zero, <@ this.DisplayRules @>)
     let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
@@ -43,10 +42,10 @@ type MainWindowViewModel() as this =
     do
         store.SelectedRule.Publish.Add (fun _ -> this.RaisePropertyChanged(<@ this.SelectedRule @>))
 
-        selectedFolder.Publish
+        store.SelectedFolder.Publish
             |> Event.add (fun _ -> store.SelectedRule.Trigger Rule.Zero)
 
-        SuperEvent.zip4 store.SavedRules store.Rules' selectedFolder store.SelectedRule
+        SuperEvent.zip4 store.SavedRules store.Rules' store.SelectedFolder store.SelectedRule
             |> Event.map (RuleListViewModel.Create selectRule)
             |> Event.add (displayRules.Trigger)
 
@@ -62,4 +61,4 @@ type MainWindowViewModel() as this =
 
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.SaveCommand = this.Factory.CommandAsyncChecked(save, fun _ -> saveEnabled.Value)
-    member this.SelectFolderCommand = this.Factory.CommandSyncParam(selectedFolder.Trigger)
+    member this.SelectFolderCommand = this.Factory.CommandSyncParam(store.SelectedFolder.Trigger)

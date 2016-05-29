@@ -4,6 +4,7 @@ let create () = {
     Rules' = SuperEvent<Rule list>([]);
     SavedRules = SuperEvent<Rule list>([]);
     SelectedRule = SuperEvent<Rule>(Rule.Zero);
+    SelectedFolder = SuperEvent<Folder>(Folder.Loading);
 }
 
 let compare list1 list2 =

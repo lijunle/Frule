@@ -2,6 +2,12 @@
 
 open Microsoft.Exchange.WebServices.Data
 
+let Loading = {
+    Id = null;
+    Name = "Loading";
+    Children = [];
+}
+
 let buildFolderHierarchy (inboxId, inboxName) (folders : Folder list) =
     let rec loop (folderId, folderName) =
         let children =
