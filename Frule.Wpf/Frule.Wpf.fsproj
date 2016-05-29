@@ -54,9 +54,6 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="AssemblyInfo.fs" />
-    <None Include="App.config" />
-    <Content Include="packages.config" />
     <Compile Include="Common/SuperEvent.fs" />
     <Compile Include="Common/DomainTypes.fs" />
     <Compile Include="Common/User.fs" />
@@ -73,6 +70,9 @@
     <Compile Include="ViewModels/RuleListViewModel.fs" />
     <Compile Include="ViewModels/RuleInfoViewModel.fs" />
     <Compile Include="ViewModels/MainWindowViewModel.fs" />
+    <Content Include="packages.config" />
+    <Compile Include="AssemblyInfo.fs" />
+    <None Include="App.config" />
     <Resource Include="App.xaml" />
     <Compile Include="App.xaml.fs" />
   </ItemGroup>
