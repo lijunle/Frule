@@ -60,6 +60,8 @@
     <Compile Include="Common/Store.fs" />
     <Resource Include="Views/LoginDialog.xaml" />
     <Compile Include="Views/LoginDialog.xaml.fs" />
+    <Resource Include="Views/FolderList.xaml" />
+    <Compile Include="Views/FolderList.xaml.fs" />
     <Resource Include="Views/RuleList.xaml" />
     <Compile Include="Views/RuleList.xaml.fs" />
     <Resource Include="Views/RuleInfo.xaml" />

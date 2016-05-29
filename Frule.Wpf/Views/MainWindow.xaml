@@ -21,21 +21,7 @@
                 <Button Command="{Binding LoginCommand}">Login</Button>
                 <Button Command="{Binding SaveCommand}">Save</Button>
             </StackPanel>
-            <TreeView x:Name="treeView" ItemsSource="{Binding InboxFolder}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectedItemChanged">
-                        <i:InvokeCommandAction
-                            Command="{Binding SelectFolderCommand}"
-                            CommandParameter="{Binding ElementName=treeView, Path=SelectedItem}"
-                        />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Name}"/>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
+            <view:FolderList/>
         </DockPanel>
         <view:RuleList Grid.Row="0" Grid.Column="1" DataContext="{Binding DisplayRules}"/>
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
