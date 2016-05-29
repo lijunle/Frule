@@ -21,7 +21,7 @@ type MainWindowViewModel() as this =
     let selectedFolder = SuperEvent<Folder>(loadingFolder)
     let inboxFolder = this.SuperEvent<Folder list>([loadingFolder], <@ this.InboxFolder @>)
     let selectedRule = this.SuperEvent<RuleInfoViewModel>(RuleInfoViewModel.Zero, <@ this.SelectedRule @>)
-    let displayRules = this.SuperEvent<Rule list>([], <@ this.DisplayRules @>)
+    let displayRules = this.SuperEvent<RuleListViewModel>(RuleListViewModel.Zero, <@ this.DisplayRules @>)
     let saveEnabled = this.SuperEvent<bool>(false, <@ this.SaveCommand @>)
 
     let updateRule (rule : Rule) =
@@ -60,7 +60,7 @@ type MainWindowViewModel() as this =
 
         SuperEvent.zip ruleStore selectedFolder
             |> Event.map (fun (s, f) -> s.Rules |> List.filter (fun r -> r.FolderId = f.Id))
-            |> Event.add (displayRules.Trigger)
+            |> Event.add (RuleListViewModel >> displayRules.Trigger)
 
         SuperEvent.zip ruleStoreSaved ruleStore
             |> Event.map (fun (v1, v2) -> RuleStore.compare v1 v2 <> 0)

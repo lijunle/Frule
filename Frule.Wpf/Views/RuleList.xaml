@@ -8,7 +8,7 @@
     d:DesignHeight="300"
     d:DesignWidth="500"
 >
-    <ListBox x:Name="listBox" ItemsSource="{Binding DisplayRules}">
+    <ListBox x:Name="listBox" ItemsSource="{Binding DisplayRules.List}">
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="SelectionChanged">
                 <i:InvokeCommandAction
