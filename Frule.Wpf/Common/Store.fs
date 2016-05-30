@@ -8,6 +8,7 @@ let create () = {
     SelectedRule = SuperEvent<Rule>(Rule.Zero);
     SelectedFolder = SuperEvent<Folder>(Folder.Loading);
     SaveButtonEnabled = SuperEvent<bool>(false);
+    LoginDialogState = SuperEvent<DialogState>(Close);
 }
 
 let loadAsync store = async {
