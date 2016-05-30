@@ -20,15 +20,13 @@ type LoginDialogViewModel(store : Store) as this =
                 state.Value <- "Login successful."
                 User.set v
                 store.User.Trigger (Some v)
-
-                do! Async.SwitchToContext ui // Otherwise, it cannot be close
-                dialog.Close()
+                store.LoginDialogState.Trigger Close
             | Failure e ->
                 state.Value <- sprintf "Login failed. %s" e.Message
         }
 
     let cancel (dialog : Window) =
-        dialog.Close()
+        store.LoginDialogState.Trigger Close
 
     member this.Email with get() = email.Value and set value = email.Value <- value
     member this.Password with get() = password.Value and set value = password.Value <- value
