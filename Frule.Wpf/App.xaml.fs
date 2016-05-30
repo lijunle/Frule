@@ -2,6 +2,7 @@
 
 open FsXaml
 open System
+open System.Windows
 open ViewModels
 open Views
 
@@ -11,7 +12,8 @@ type App = XAML<"App.xaml">
 [<EntryPoint>]
 let main _ =
     let store = Store.create()
-    let viewModel = MainWindowViewModel(store)
-    let window = MainWindow(DataContext = viewModel)
+    let windowViewModel = MainWindowViewModel(store)
+    let window = MainWindow(DataContext = windowViewModel)
+    LoginDialogViewModel.Register store
     Async.Start (Store.loadAsync store)
     App().Run(window)

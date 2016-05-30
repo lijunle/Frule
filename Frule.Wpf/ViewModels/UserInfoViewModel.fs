@@ -13,9 +13,7 @@ type UserInfoViewModel(store : Store) as this =
     let saveButtonEnabled = store.SaveButtonEnabled
 
     let login _ =
-        let viewModel = LoginDialogViewModel(store)
-        let dialog = LoginDialog(DataContext = viewModel)
-        dialog.ShowDialog() |> ignore
+        store.LoginDialogState.Trigger Open
         Store.loadAsync store
 
     let save _ = async {
