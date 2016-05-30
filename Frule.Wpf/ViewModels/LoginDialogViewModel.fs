@@ -1,6 +1,7 @@
 ﻿namespace ViewModels
 
 open FSharp.ViewModule
+open Views
 
 type LoginDialogViewModel(store : Store) as this =
     inherit ViewModelBase()
@@ -26,6 +27,17 @@ type LoginDialogViewModel(store : Store) as this =
 
     let cancel () =
         store.LoginDialogState.Trigger Close
+
+    static member Register store =
+        let mutable dialog = null
+        store.LoginDialogState.Publish.Add (fun v ->
+            match v with
+            | Open ->
+                let dialogViewModel = LoginDialogViewModel(store)
+                dialog <- LoginDialog(DataContext = dialogViewModel)
+                dialog.ShowDialog() |> ignore
+            | Close ->
+                dialog.Close())
 
     member this.Email with get() = email.Value and set value = email.Value <- value
     member this.Password with get() = password.Value and set value = password.Value <- value
