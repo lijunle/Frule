@@ -39,8 +39,8 @@ type LoginDialogViewModel(store : Store) as this =
             | Close ->
                 dialog.Close())
 
-    member this.Email with get() = email.Value and set value = email.Value <- value
-    member this.Password with get() = password.Value and set value = password.Value <- value
-    member this.State with get() = state.Value and set value = state.Value <- value
+    member __.Email with get() = email.Value and set value = email.Value <- value
+    member __.Password with get() = password.Value and set value = password.Value <- value
+    member __.State with get() = state.Value and set value = state.Value <- value
     member this.LoginCommand = this.Factory.CommandAsync(login)
     member this.CancelCommand = this.Factory.CommandSync(cancel)
